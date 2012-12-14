@@ -1,6 +1,9 @@
 #
 *.pyc
 
+#
+test/bindertest/test.db3
+
 # OS X noise
 .DS_Store
 
