@@ -1,7 +1,7 @@
 
 import unittest
 
-from binder.api import *
+from binder import *
 
 from bindertest.testdbconfig import connect
 
