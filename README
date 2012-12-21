@@ -1,0 +1,56 @@
+
+# Binder - A Python SQL Mapper.
+
+Binder is a mapping engine for SQL databases.
+
+Binder lets you define schemas and perform SQL operations using native Python
+data types and methods.  Binder takes care of SQL query generation, parameter
+passing and data conversion.
+
+Binder is explicitly designed to be a transparent SQL mapping that gives you
+direct control of what database queries are executed.
+
+To achieve this, Binder is designed as follows:
+
+- one SQL row maps to one Python dictionary
+- one SQL column maps to one key in the Python dictionary
+- one SQL query maps to one python method in the API
+
+Note that Binder is *NOT* an ORM and does not provide ORM style features such
+as parent child containment, lazy loading, etc.
+
+Currently, Binder supports the SQLite embedded database via Python's built-in
+sqlite3 module.
+
+
+## Quick Tour
+
+Let's start by creating a new database using SQLite:
+
+    >>> from binder import *
+    >>> conn = Connection("readme.db3")
+
+Define the schema for a table and create it in the database:
+
+    >>> Stocks = Table("trades",
+    ...     DateCol("date"), StringCol("trans", 4), StringCol("symbol", 4),
+    ...     IntCol("qty"), IntCol("price")
+    ... )
+    >>> conn.create_table(Stocks)
+
+Insert some data:
+
+    >>> from datetime import date
+    >>> row = { # Just a regular Python dictionary
+    ...     "date":date(2006, 1, 5), "trans":"BUY", "symbol":"RHAT",
+    ...     "qty":100, "price":35
+    ... }
+    >>> conn.insert(Stocks, row) # Insert the row in the database
+    >>> conn.commit() # Commit the transaction
+
+Finally, retrieve the data:
+
+    >>> conn.select(Stocks)
+    [{'date': datetime.date(2006, 1, 5), 'symbol': u'RHAT', 'trans': u'BUY', 'price'
+    : 35, 'qty': 100}]
+
