@@ -15,12 +15,12 @@ def runtestdir(subdir):
         if not f.startswith("test_"):
             continue
         test_file = os.path.join(subdir, f)
-        print "FILE:", test_file
+        print >> sys.stderr, "FILE:", test_file
         exit_code = os.system(sys.executable + " " + test_file)
         total += 1
         if exit_code != 0:
             errs += 1
-    print "SUMMARY: %s -> %s total / %s error (%s)" \
+    print >> sys.stderr, "SUMMARY: %s -> %s total / %s error (%s)" \
         % (subdir, total, errs, sys.executable)
 
 
