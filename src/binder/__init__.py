@@ -1,5 +1,7 @@
 "Binder Database API."
 
+__version__ = '0.5'
+
 # Column definition
 from binder.col import AutoIdCol
 from binder.col import IntCol
