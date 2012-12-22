@@ -236,13 +236,13 @@ class TableTest(unittest.TestCase):
         self.assert_(isinstance(qexpr, SqlCondition))
         qexpr = Foo.q.d1 == None
         self.assert_(isinstance(qexpr, SqlCondition))
-        qexpr = Foo.q.d1 > datetime.date(2007, 5, 22)
+        qexpr = Foo.q.d1 > date(2007, 5, 22)
         self.assert_(isinstance(qexpr, SqlCondition))
-        qexpr = Foo.q.d1 >= datetime.date(2007, 5, 22)
+        qexpr = Foo.q.d1 >= date(2007, 5, 22)
         self.assert_(isinstance(qexpr, SqlCondition))
-        qexpr = Foo.q.d1 < datetime.date(2007, 5, 22)
+        qexpr = Foo.q.d1 < date(2007, 5, 22)
         self.assert_(isinstance(qexpr, SqlCondition))
-        qexpr = Foo.q.d1 <= datetime.date(2007, 5, 22)
+        qexpr = Foo.q.d1 <= date(2007, 5, 22)
         self.assert_(isinstance(qexpr, SqlCondition))
 
     def test_q_ops_check_value(self):

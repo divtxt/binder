@@ -1,7 +1,20 @@
 "Classes representing SQL column types."
 
-import datetime
-from binder import isodate
+from datetime import date, datetime
+
+__all__ = [
+    "AutoIdCol",
+    "IntCol",
+    "BoolCol",
+    "StringCol",
+    "DateCol",
+    "DateTimeUTCCol",
+    ]
+
+
+def parse_isodatetime(s):
+    return datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ")
+
 
 class ColBase:
     "Column type base."
@@ -150,7 +163,7 @@ class DateCol(ColBase):
     "Date column."
 
     def __init__(self, col_name):
-        ColBase.__init__(self, col_name, False, datetime.date, None)
+        ColBase.__init__(self, col_name, False, date, None)
     
     def py_to_db(self, value):
         if value is None:
@@ -166,7 +179,7 @@ class DateCol(ColBase):
             # parse ISO date string
             assert type(dbvalue) in [str, unicode]
             yyyy, mm, dd = dbvalue.split("-")
-            return datetime.date(int(yyyy), int(mm), int(dd))
+            return date(int(yyyy), int(mm), int(dd))
 
     def parse_str(self, value):
         if value == "":
@@ -179,7 +192,7 @@ class DateTimeUTCCol(ColBase):
     "DateTime UTC column."
 
     def __init__(self, col_name):
-        ColBase.__init__(self, col_name, False, datetime.datetime, None)
+        ColBase.__init__(self, col_name, False, datetime, None)
     
     def py_to_db(self, value):
         if value is None:
@@ -195,7 +208,7 @@ class DateTimeUTCCol(ColBase):
         else:
             # parse ISO datetime string
             assert type(dbvalue) in [str, unicode]
-            return isodate.parse_datetime(dbvalue)
+            return parse_isodatetime(dbvalue)
 
     def parse_str(self, value):
         if value == "":

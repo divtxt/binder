@@ -1,11 +1,12 @@
 
+from binder import col
+from binder.col import *
+import datetime
 import unittest
 
-import datetime
-from binder.col import *
 
 
-class _XCol(ColBase):
+class _XCol(col.ColBase):
     pass
 
 
