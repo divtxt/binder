@@ -19,7 +19,7 @@ class Table:
                     "Table '%s' has more than one AutoIdCol" % table_name
                 auto_id_col = col
         self.auto_id_col = auto_id_col
-        self.q = _Q(table_name, cols)
+        self.q = QueryCols(table_name, cols)
 
     def new(self, **col_values):
         row = {}
@@ -55,15 +55,15 @@ class Table:
 
 
 
-class _Q:
+class QueryCols:
 
     def __init__(self, table_name, cols):
         for col in cols:
-            qcol = _QCol(col)
+            qcol = QueryCol(col)
             setattr(self, col.col_name, qcol)
 
 
-class _QCol:
+class QueryCol:
 
     def __init__(self, col):
         self._col = col
@@ -108,8 +108,7 @@ class SqlCondition:
         self.other = other
 
     def __repr__(self):
-        return '"%s %s %s"' \
-            % (self.col.col_name, self.op, repr(self.other))
+        return '"%s"' % self._repr1()
 
     def _repr1(self):
         return "%s %s %s" \

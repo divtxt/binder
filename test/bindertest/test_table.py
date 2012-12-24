@@ -227,7 +227,7 @@ class TableTest(unittest.TestCase):
         try:
             Foo.q.i2
         except AttributeError, e:
-            self.assertEquals("_Q instance has no attribute 'i2'", str(e))
+            self.assertEquals("QueryCols instance has no attribute 'i2'", str(e))
         else:
             self.fail()
 

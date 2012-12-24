@@ -1,6 +1,6 @@
 
 from binder.col import *
-from binder.table import SqlCondition, SqlSort, AND, OR, _QCol
+from binder.table import SqlCondition, SqlSort, AND, OR, QueryCol
 
 _COL_TYPE = {
     AutoIdCol: "INTEGER PRIMARY KEY",
@@ -150,7 +150,7 @@ def select(table, where=None, order_by=None):
 
 
 def select_distinct(table, qcol, where=None, order_by=None):
-    assert isinstance(qcol, _QCol), "Column must be instance of _QCol"
+    assert isinstance(qcol, QueryCol), "Column must be instance of QueryCol"
     col_name = qcol._col.col_name
     sql_parts = ["SELECT DISTINCT", col_name, "FROM", table.table_name]
     if where:
