@@ -1,0 +1,151 @@
+
+# Binder - User Manual
+
+Binder is a Python mapping API for SQL databases.
+
+See the file README as well for more details.
+
+
+## Overview
+
+To use the Binder API, import as follows:
+
+    from binder import *
+
+This will import the following names:
+
+- 'Connection' - the Binder database connection and query class
+- 'Table' - used to define an SQL table
+- various names ending in Col e.g. 'StringCol' - used to define an SQL column
+- 'AND', 'OR' - used to build SQL queries
+
+
+Using Binder involves one of the following actions:
+
+- define a schema using 'Table' and various columns e.g. 'StringCol'
+- connecting to a database using 'Connection'
+- performing SQL queries using the connection object
+
+
+Here is an example schema definition:
+
+    >>> Foo = Table("foo", AutoIdCol("foo_id"), IntCol("n"), StringCol("s",10))
+
+This defines a table named 'foo' which has 3 columns: foo_id is an
+autoincremented id column, n is an integer column, and s is a string column
+(with a size limit of 10 characters).
+
+
+Here is how you connect to an SQLite3 database:
+
+    >>> sqlconn = Connection("test.db3")
+
+Note that SQLite3 will create the database file if it does not exist.
+
+
+Here is how you create the database table 'foo':
+
+    >>> sqlconn.create_table(Foo)
+
+The create_table() call will generate and run the correct CREATE TABLE
+statement for the schema defined by Foo.  Note that it will throw an
+error if the table already exists.
+
+
+Let's INSERT 2 rows of data:
+
+    >>> foo1 = {"foo_id": None, "n": 10, "s": "Hello"}
+    >>> foo2 = {"foo_id": None, "n": 20, "s": "World"}
+    >>> sqlconn.insert(Foo, foo1)
+    >>> foo1
+    {'s': 'Hello', 'foo_id': 1, 'n': 10}
+    >>> sqlconn.insert(Foo, foo2)
+    >>> foo2
+    {'s': 'World', 'foo_id': 2, 'n': 20}
+    >>> sqlconn.commit()
+
+Note that the python's None value is used with columns of type
+AutoIdCol to tell SqlDict to use the next database id for the row being
+inserted.  Note also that the insert() call modifies the original
+dictionary by replacing the None value with the actual id of the
+inserted row.
+
+Finally, let us run a SELECT query on the database table:
+
+    >>> sqlconn = Connection("test.db3")
+    >>> foo_list = sqlconn.select(Foo)
+    >>> for foo in foo_list:
+    ...     print foo
+    ...
+    {'s': 'Hello', 'foo_id': 1, 'n': 10}
+    {'s': 'World', 'foo_id': 2, 'n': 20}
+
+Note that select() currently returns a list containing a dictionary
+for each row in the result.
+
+
+## 'Connection'
+
+'Connection' represents an SQLite3 database connection. The syntax to create
+a connection is:
+
+    sqlconn = Connection(dbfile, read_only=None)
+
+A Connection object has the following API methods:
+
+- commit() - commit the current transaction
+- rollback() - rollback the current transaction
+- close() - close the database connection
+
+- create_table(table) - run CREATE TABLE for the given table schema
+- drop_table(table) - run DROP TABLE for the given table schema
+
+- insert(table, row) - INSERT the given row
+
+- update(table, row, where) - UPDATE using given row and WHERE clause
+- update_by_id(table, row) - UPDATE given row by it's id (AutoIdCol)
+
+- delete(table, where) - DELETE using given WHERE clause
+- delete_by_id(table, row_id) - DELETE row with given id (AutoIdCol)
+
+- select(table, where=None, order_by=None) - SELECT as specified, returns list
+- get(table, row_id) - SELECT row with given id (AutoIdCol)
+
+- xselect(table, where=None, order_by=None) - same as SELECT but returns an iterator
+
+For more detailed examples, especially on how to construct WHERE clauses
+and ORDER BY clauses, please see the automated tests.
+
+
+### 'Table'
+
+'Table' lets you define a table schema. It's usage is:
+
+    t = Table( "<table_name">, <col1>, <col2>, ...)
+
+Note that a Table cannot have more than one AutoIdCol column.
+
+
+### Column Types
+
+The following column types are defined:
+
+- AutoIdCol(col_name) - automatic integer primary key (Python integer)
+- IntCol(col_name, not_null=True) - Python integer
+- BoolCol(col_name, not_null=True) - Python boolean
+- StringCol(col_name, length, unique=False) - unicode with given maximum length
+- DateCol(col_name) - Python datetime.date
+- DateTimeUTCCol(col_name) - Python datetime.datetime without timezone
+    (tzinfo field not filled in - the 
+
+Note that some column types let you control the SQL NOT NULL option. If you
+allow NULLs for a column (i.e. not_null=False), the Python None value is
+used as representing SQL NULL.
+
+
+### AND and OR
+
+Used for constructing where clauses in queries. See test_select.py for examples.
+
+
+
