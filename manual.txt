@@ -16,13 +16,13 @@ This will import the following names:
 
 - 'Connection' - the Binder database connection and query class
 - 'Table' - used to define an SQL table
-- various names ending in Col e.g. 'StringCol' - used to define an SQL column
+- Column types e.g. 'StringCol' - used to define an SQL column
 - 'AND', 'OR' - used to build SQL queries
 
 
 Using Binder involves one of the following actions:
 
-- define a schema using 'Table' and various columns e.g. 'StringCol'
+- define a schema using 'Table' and columns e.g. 'StringCol'
 - connecting to a database using 'Connection'
 - performing SQL queries using the connection object
 
@@ -93,25 +93,29 @@ a connection is:
 
 A Connection object has the following API methods:
 
-- commit() - commit the current transaction
-- rollback() - rollback the current transaction
-- close() - close the database connection
+- Connection & transaction management:
+    - commit() - commit the current transaction
+    - rollback() - rollback the current transaction
+    - close() - close the database connection
 
-- create_table(table) - run CREATE TABLE for the given table schema
-- drop_table(table) - run DROP TABLE for the given table schema
+- Schema definition SQL queries:
+    - create_table(table)
+    - drop_table(table)
 
-- insert(table, row) - INSERT the given row
+- Basic SQL queries:
+    - insert(table, row) - INSERT the given row
+    - select(table, where=None, order_by=None) - SELECT rows as specified, returns list
+    - update(table, row, where) - UPDATE using given row and WHERE clause
+    - delete(table, where) - DELETE using given WHERE clause
 
-- update(table, row, where) - UPDATE using given row and WHERE clause
-- update_by_id(table, row) - UPDATE given row by it's id (AutoIdCol)
+- Basic SQL queries using row id:
+    - update_by_id(table, row) - UPDATE given row by it's id (AutoIdCol)
+    - get(table, row_id) - SELECT row with given id (AutoIdCol)
+    - delete_by_id(table, row_id) - DELETE row with given id (AutoIdCol)
 
-- delete(table, where) - DELETE using given WHERE clause
-- delete_by_id(table, row_id) - DELETE row with given id (AutoIdCol)
+- Misc:
+    - xselect(table, where=None, order_by=None) - same as select() but returns an iterator
 
-- select(table, where=None, order_by=None) - SELECT as specified, returns list
-- get(table, row_id) - SELECT row with given id (AutoIdCol)
-
-- xselect(table, where=None, order_by=None) - same as SELECT but returns an iterator
 
 For more detailed examples, especially on how to construct WHERE clauses
 and ORDER BY clauses, please see the automated tests.
