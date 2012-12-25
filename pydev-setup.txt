@@ -1,0 +1,77 @@
+
+# About
+
+Binder is mainly developed using PyDev.
+
+This document explains the setup steps.  It is written for the following
+software versions:
+
+- OS X 10.8
+- Eclipse Indigo Service Release 2 (aka 3.8?)
+- PyDev 2.6
+
+Also note:
+- Eclipse & PyDev initial settings are assumed to be the defaults
+- Steps marked 'OPTIONAL' are individual developer preference
+
+
+## Eclipse & PyDev Configuration
+
+- Install Eclipse
+
+- Install PyDev
+
+- In Eclipse, Open the Pydev perspective (and close Java perspective)
+
+- Open Eclipse Prefences and apply the following settings
+
+- In section: General -> Editors -> Text Editors
+    - check 'Insert spaces for tabs'
+    - OPTIONAL: check 'Show line numbers'
+    - OPTIONAL: check 'Show print margin'
+    - OPTIONAL: check 'Show whitespace characters'
+        - uncheck 'Space' for 'Leading' & 'Enclosed'
+        - uncheck 'Line Feed' for 'Trailing'
+
+- In section: Pydev -> Interpreter - Python
+    - use 'Auto Config' 
+        - OR customize as preferred
+
+- In section: Pydev -> Editor -> Typing
+    - uncheck 'After '(' indent to its level ...'
+
+- OPTIONAL: In section: General -> Appearance -> Colors and Fonts
+    - go to Basic -> Text Font
+        - click 'Change...'
+        - choose Menlo or preferred programming font
+
+- OPTIONAL: In section: Pydev -> Editor
+    - under 'Appearance color options', choose 'Comments'
+    - change the color to a darker grey (or other color)
+
+
+## Project import
+
+- Checkout/unzip the project source in your workspace directory
+
+- In Eclipse, choose menu: File -> Import -> Existing projects into workspace
+
+- Select workspace directory ('Browse' should show this as default)
+
+- Choose the project(s)
+
+
+## Eclipse/PyDev Usage Tips
+
+While editing a python file, use the following Eclipse/PyDev features:
+
+- menu item Source -> Format Code
+    - keyboard shortcut: Ctrl-Shift-F / Command-Shift-F
+
+- menu item Source -> Oragnize Imports
+    - keyboard shortcut: Ctrl-Shift-O / Command-Shift-O
+
+    - TIP: this should not be used in a few cases e.g. python files which
+      modify sys.path before import
+    
+
