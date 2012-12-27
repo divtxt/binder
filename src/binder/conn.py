@@ -1,19 +1,15 @@
 
-import sqlite3
-import itertools
-
 from binder import sqlgen
-from binder.table import SqlCondition, AND
 
 _debug = False
 
 class Connection:
 
-    def __init__(self, dbfile, read_only=None):
-        self._dbconn = sqlite3.connect(dbfile)
+    def __init__(self, dbconn, dberror, read_only=None):
+        self._dbconn = dbconn
         self._last_ri = None
         self._read_only = read_only
-        self.DbError = sqlite3.Error
+        self.DbError = dberror
 
 
     def commit(self):
@@ -222,7 +218,6 @@ class ResultIterator:
             dbvalue = values[i]
             value = col.db_to_py(dbvalue)
             row[col.col_name] = value
-        #row = dict(itertools.izip(self.col_names, values))
         return row
 
 

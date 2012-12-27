@@ -18,4 +18,4 @@ from binder.table import AND
 from binder.table import OR
 
 # Connection object
-from binder.conn import Connection
+from binder.db_sqlite3 import Sqlite3Connection
