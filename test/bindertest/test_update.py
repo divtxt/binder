@@ -1,5 +1,6 @@
 
 import unittest
+from assertutil import get_assert_tuple_args
 
 from binder import *
 import datetime
@@ -67,7 +68,7 @@ class ConnUpdateTest(unittest.TestCase):
             conn.update_by_id(Foo2, foo3)
         except AssertionError, e:
             expected = "update_by_id(): more than 1 row updated", ("foo", "i1", 101, 2)
-            self.assertEquals(expected, e.args)
+            self.assertEquals(expected, get_assert_tuple_args(e))
         else:
             self.fail()
 

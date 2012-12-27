@@ -1,5 +1,6 @@
 
 import unittest
+from assertutil import get_assert_tuple_args
 
 from binder import *
 import datetime
@@ -57,7 +58,7 @@ class ConnDeleteTest(unittest.TestCase):
             conn.delete_by_id(Foo2, 101)
         except AssertionError, e:
             expected = "delete_by_id(): more than 1 row deleted", ("foo", "i1", 101, 2)
-            self.assertEquals(expected, e.args)
+            self.assertEquals(expected, get_assert_tuple_args(e))
         else:
             self.fail()
 

@@ -1,5 +1,6 @@
 
 import unittest
+from assertutil import get_assert_tuple_args
 
 from binder import *
 
@@ -34,7 +35,7 @@ class ConnSelectOneTest(unittest.TestCase):
         try:
             conn.select_one(Foo, Foo.q.s1 == "xyz")
         except AssertionError, e:
-            msg, info = e.args
+            msg, info = get_assert_tuple_args(e)
             self.assertEquals("select_one(): more than 1 row", msg)
             table_name, sqlcond = info
             #table_name, sqlcond, rc = info
