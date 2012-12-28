@@ -19,3 +19,4 @@ from binder.table import OR
 
 # Connection object
 from binder.db_sqlite3 import Sqlite3Connection
+from binder.db_mysql import MysqlConnection

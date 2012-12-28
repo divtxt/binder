@@ -14,6 +14,16 @@ Foo = Table(
     DateCol("d1"),
 )
 
+_NO_TABLE_FOO = [
+    ("no such table: foo",),            # sqlite3
+    (1051, "Unknown table \'foo\'"),    # MySQL
+    ]
+
+_TABLE_FOO_EXISTS = [
+    ("table foo already exists"),           # sqlite3
+    (1050, "Table \'foo\' already exists"), # MySQL
+    ]
+
 
 
 class CreateDropTest(unittest.TestCase):
@@ -23,21 +33,21 @@ class CreateDropTest(unittest.TestCase):
         try:
             conn.drop_table(Foo)
         except conn.DbError, e:
-            self.assertEquals("no such table: foo", str(e))
+            self.assertIn(e.args, _NO_TABLE_FOO)
         conn = connect()
         conn.create_table(Foo)
         conn = connect()
         try:
             conn.create_table(Foo)
         except conn.DbError, e:
-            self.assertEquals("table foo already exists", str(e))
+            self.assertIn(e.args, _TABLE_FOO_EXISTS)
         conn = connect()
         conn.drop_table(Foo)
         conn = connect()
         try:
             conn.drop_table(Foo)
         except conn.DbError, e:
-            self.assertEquals("no such table: foo", str(e))
+            self.assertIn(e.args, _NO_TABLE_FOO)
 
     def test_drop_if_exists(self):
         conn = connect()
@@ -47,7 +57,7 @@ class CreateDropTest(unittest.TestCase):
         try:
             conn.drop_table(Foo)
         except conn.DbError, e:
-            self.assertEquals("no such table: foo", str(e))
+            self.assertIn(e.args, _NO_TABLE_FOO)
         conn = connect()
         conn.drop_table(Foo, if_exists=True)
         conn.drop_table_if_exists(Foo)
