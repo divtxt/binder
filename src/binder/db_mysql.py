@@ -9,5 +9,9 @@ class MysqlConnection(Connection):
         read_only = kwargs.pop('read_only', None)
         dbconn = MySQLdb.connect(*args, **kwargs)
         dberror = MySQLdb.Error
-        Connection.__init__(self, dbconn, dberror, DIALECT_MYSQL, read_only)
+        Connection.__init__(
+            self, dbconn, dberror,
+            DIALECT_MYSQL, "%s",
+            read_only
+            )
 

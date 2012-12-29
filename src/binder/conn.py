@@ -5,12 +5,13 @@ _debug = False
 
 class Connection:
 
-    def __init__(self, dbconn, dberror, sqlgen_dialect, read_only):
+    def __init__(self, dbconn, dberror, sqlgen_dialect, paramstr, read_only):
         self._dbconn = dbconn
         self._last_ri = None
         self._read_only = read_only
         self.DbError = dberror
         self.sqlgen_dialect = sqlgen_dialect
+        self.paramstr = paramstr
 
 
     def commit(self):
@@ -64,7 +65,7 @@ class Connection:
         # read only check
         self._check_write_ok()
         # gen sql
-        sql, values, auto_id_used = sqlgen.insert(table, row)
+        sql, values, auto_id_used = sqlgen.insert(table, row, self.paramstr)
         # execute sql
         cursor = self._execute(sql, values)
         assert cursor.rowcount == 1, \
@@ -78,7 +79,7 @@ class Connection:
         # read only check
         self._check_write_ok()
         # gen sql
-        sql, values = sqlgen.update(table, row, where)
+        sql, values = sqlgen.update(table, row, where, self.paramstr)
         # execute sql
         cursor = self._execute(sql, values)
         rowcount = cursor.rowcount
