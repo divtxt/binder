@@ -100,7 +100,8 @@ A Connection object has the following API methods:
 
 - Schema definition SQL queries:
     - create_table(table)
-    - drop_table(table)
+    - drop_table(table, if_exists=False)
+    - drop_table_if_exists(table)
 
 - Basic SQL queries:
     - insert(table, row) - INSERT the given row

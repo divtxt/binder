@@ -12,14 +12,8 @@ class ConnInsertTest(unittest.TestCase):
 
     def setUp(self):
         conn = connect()
-        try:
-            conn.drop_table(Foo)
-        except conn.DbError, e:
-            self.assertEquals("no such table: foo", str(e))
-        try:
-            conn.drop_table(Baz)
-        except conn.DbError, e:
-            self.assertEquals("no such table: baz", str(e))
+        conn.drop_table_if_exists(Foo)
+        conn.drop_table_if_exists(Baz)
         conn = connect()
         conn.create_table(Foo)
         conn.create_table(Baz)

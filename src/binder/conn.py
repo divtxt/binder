@@ -48,12 +48,15 @@ class Connection:
         sql = sqlgen.create_table(table)
         self._execute(sql)
 
-    def drop_table(self, table):
+    def drop_table(self, table, if_exists=False):
         # read only check
         self._check_write_ok()
         #
-        sql = sqlgen.drop_table(table)
+        sql = sqlgen.drop_table(table, if_exists)
         self._execute(sql)
+
+    def drop_table_if_exists(self, table):
+        self.drop_table(table, True)
 
 
     def insert(self, table, row):

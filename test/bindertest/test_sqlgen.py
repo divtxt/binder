@@ -44,6 +44,14 @@ class CreateTableTest(unittest.TestCase):
             )
 
 
+class DropTableTest(unittest.TestCase):
+
+    def test(self):
+        sql = sqlgen.drop_table(Foo, False)
+        self.assertEquals("DROP TABLE foo", sql)
+        sql = sqlgen.drop_table(Bar, True)
+        self.assertEquals("DROP TABLE IF EXISTS bar", sql)
+
 
 class InsertTest(unittest.TestCase):
 

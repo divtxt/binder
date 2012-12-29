@@ -20,11 +20,7 @@ class CommitRollbackTest(unittest.TestCase):
 
     def setUp(self):
         conn = connect()
-        try:
-            conn.drop_table(Foo)
-        except conn.DbError, e:
-            self.assertEquals("no such table: foo", str(e))
-        conn = connect()
+        conn.drop_table_if_exists(Foo)
         conn.create_table(Foo)
 
     def test_commit(self):

@@ -2,10 +2,9 @@
 import unittest
 
 from binder import *
-import datetime
 
 from bindertest.testdbconfig import connect
-from bindertest.tabledefs import Foo, Bar
+from bindertest.tabledefs import Foo
 
 
 
@@ -13,11 +12,7 @@ class ConnCloseTest(unittest.TestCase):
 
     def setUp(self):
         conn = connect()
-        try:
-            conn.drop_table(Foo)
-        except conn.DbError, e:
-            self.assertEquals("no such table: foo", str(e))
-        conn = connect()
+        conn.drop_table_if_exists(Foo)
         conn.create_table(Foo)
 
     def test_close_insert(self):

@@ -18,7 +18,7 @@ Foo = Table(
 
 class CreateDropTest(unittest.TestCase):
 
-    def test(self):
+    def test_create_drop(self):
         conn = connect()
         try:
             conn.drop_table(Foo)
@@ -38,6 +38,19 @@ class CreateDropTest(unittest.TestCase):
             conn.drop_table(Foo)
         except conn.DbError, e:
             self.assertEquals("no such table: foo", str(e))
+
+    def test_drop_if_exists(self):
+        conn = connect()
+        conn.create_table(Foo)
+        conn = connect()
+        conn.drop_table(Foo, if_exists=True)
+        try:
+            conn.drop_table(Foo)
+        except conn.DbError, e:
+            self.assertEquals("no such table: foo", str(e))
+        conn = connect()
+        conn.drop_table(Foo, if_exists=True)
+        conn.drop_table_if_exists(Foo)
 
     def test_create_RO(self):
         conn = connect("test123")

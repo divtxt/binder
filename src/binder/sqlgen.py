@@ -27,8 +27,9 @@ def create_table(table):
     return sql
 
 
-def drop_table(table):
-    sql = "DROP TABLE %s" % table.table_name
+def drop_table(table, if_exists):
+    sql = "DROP TABLE IF EXISTS %s" if if_exists else "DROP TABLE %s"
+    sql = sql % table.table_name
     return sql
 
 

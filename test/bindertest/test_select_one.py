@@ -5,17 +5,14 @@ from assertutil import get_assert_tuple_args
 from binder import *
 
 from bindertest.testdbconfig import connect
-from bindertest.tabledefs import Foo, Bar
+from bindertest.tabledefs import Foo
 
 
 class ConnSelectOneTest(unittest.TestCase):
 
     def setUp(self):
         conn = connect()
-        try:
-            conn.drop_table(Foo)
-        except conn.DbError, e:
-            self.assertEquals("no such table: foo", str(e))
+        conn.drop_table_if_exists(Foo)
         conn = connect()
         conn.create_table(Foo)
 
