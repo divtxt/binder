@@ -27,7 +27,7 @@ class CreateTableTest(unittest.TestCase):
             """CREATE TABLE foo (
     foo_id INT AUTO_INCREMENT PRIMARY KEY,
     i1 INT NOT NULL,
-    s1 VARCHAR(10) NOT NULL COLLATE NOCASE,
+    s1 VARCHAR(10) NOT NULL COLLATE utf8_general_ci,
     d1 DATE
 )""",
             sql

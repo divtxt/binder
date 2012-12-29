@@ -27,8 +27,10 @@ _COL_TYPE_MYSQL = {
 def create_table(dialect, table):
     if dialect == DIALECT_SQLITE3:
         col_types = _COL_TYPE_SQLITE3
+        collate_nocase_name = "NOCASE"
     elif dialect == DIALECT_MYSQL:
         col_types = _COL_TYPE_MYSQL
+        collate_nocase_name = "utf8_general_ci"
     else:
         assert False, "Unknown dialect: %s" % dialect
     col_defs = []
@@ -43,7 +45,7 @@ def create_table(dialect, table):
             if col.unique:
                 col_def = col_def + " UNIQUE"
             if col.collate_nocase:
-                col_def = col_def + " COLLATE NOCASE"
+                col_def = col_def + " COLLATE " + collate_nocase_name
         col_defs.append(col_def)
     cols_sql = ",\n    ".join(col_defs)
     sql = "CREATE TABLE %s (\n    %s\n)" \
