@@ -16,6 +16,7 @@ _VALID_ISOLATION_LEVELS = [
 class Connection:
 
     def __init__(self, dbconn, dberror, sqlgen_dialect, paramstr, read_only):
+        self._is_open = True
         self._dbconn = dbconn
         self._last_ri = None
         self._read_only = read_only
@@ -33,6 +34,8 @@ class Connection:
     def close(self):
         self._close_last_ri()
         self._dbconn.close()
+        self._dbconn = None
+        self._is_open = False
 
 
     def _close_last_ri(self):
@@ -41,6 +44,7 @@ class Connection:
             self._last_ri = None
 
     def _execute(self, sql, values=[]):
+        assert self._is_open, "Connection is closed"
         if _debug:
             print "DEBUG: _execute(%s, %s)" % (repr(sql), values)
         self._close_last_ri()

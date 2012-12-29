@@ -24,8 +24,8 @@ class ConnCloseTest(unittest.TestCase):
         foo2 = Foo.new(foo_id=2, s1="beta")
         try:
             conn.insert(Foo, foo2)
-        except conn.DbError, e:
-            self.assertEquals("Cannot operate on a closed database.", str(e))
+        except AssertionError, e:
+            self.assertEquals("Connection is closed", str(e))
         else:
             self.fail()
 
