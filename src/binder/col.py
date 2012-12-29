@@ -175,9 +175,11 @@ class DateCol(ColBase):
     def db_to_py(self, dbvalue):
         if dbvalue is None:
             return None
+        elif isinstance(dbvalue, date):
+            return dbvalue
         else:
-            # parse ISO date string
-            assert type(dbvalue) in [str, unicode]
+            # sqlite: parse ISO date string
+            assert isinstance(dbvalue, basestring)
             yyyy, mm, dd = dbvalue.split("-")
             return date(int(yyyy), int(mm), int(dd))
 
