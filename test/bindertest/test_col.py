@@ -66,6 +66,7 @@ class AutoIdColTest(unittest.TestCase):
     def test_check_value(self):
         col = AutoIdCol('alpha')
         col.check_value(1)
+        col.check_value(-42L)
         col.check_value(None)
 
     def test_parse_str(self):

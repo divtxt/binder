@@ -77,6 +77,8 @@ class AutoIdCol(ColBase):
     def check_value(self, value):
         if value is None:
             return
+        if type(value) is long:
+            return
         ColBase.check_value(self, value)
 
 
