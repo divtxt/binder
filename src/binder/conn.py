@@ -5,11 +5,12 @@ _debug = False
 
 class Connection:
 
-    def __init__(self, dbconn, dberror, read_only=None):
+    def __init__(self, dbconn, dberror, sqlgen_dialect, read_only):
         self._dbconn = dbconn
         self._last_ri = None
         self._read_only = read_only
         self.DbError = dberror
+        self.sqlgen_dialect = sqlgen_dialect
 
 
     def commit(self):
@@ -45,7 +46,7 @@ class Connection:
         # read only check
         self._check_write_ok()
         #
-        sql = sqlgen.create_table(table)
+        sql = sqlgen.create_table(self.sqlgen_dialect, table)
         self._execute(sql)
 
     def drop_table(self, table, if_exists=False):

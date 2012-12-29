@@ -12,7 +12,7 @@ from bindertest.tabledefs import Foo, Bar, Baz
 class CreateTableTest(unittest.TestCase):
 
     def test(self):
-        sql = sqlgen.create_table(Foo)
+        sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE3, Foo)
         self.assertEquals(
             """CREATE TABLE foo (
     foo_id INTEGER PRIMARY KEY,
@@ -22,7 +22,17 @@ class CreateTableTest(unittest.TestCase):
 )""",
             sql
             )
-        sql = sqlgen.create_table(Bar)
+        sql = sqlgen.create_table(sqlgen.DIALECT_MYSQL, Foo)
+        self.assertEquals(
+            """CREATE TABLE foo (
+    foo_id INT AUTO_INCREMENT PRIMARY KEY,
+    i1 INT NOT NULL,
+    s1 VARCHAR(10) NOT NULL,
+    d1 DATE
+)""",
+            sql
+            )
+        sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE3, Bar)
         self.assertEquals(
             """CREATE TABLE bar (
     bi INTEGER,
@@ -33,12 +43,32 @@ class CreateTableTest(unittest.TestCase):
 )""",
             sql
             )
-        sql = sqlgen.create_table(Baz)
+        sql = sqlgen.create_table(sqlgen.DIALECT_MYSQL, Bar)
+        self.assertEquals(
+            """CREATE TABLE bar (
+    bi INT,
+    bs VARCHAR(10) NOT NULL,
+    bd DATE,
+    bdt1 DATETIME,
+    bb BOOL NOT NULL
+)""",
+            sql
+            )
+        sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE3, Baz)
         self.assertEquals(
             """CREATE TABLE baz (
     baz_id INTEGER PRIMARY KEY,
     i3 INTEGER NOT NULL,
     s3 TEXT NOT NULL UNIQUE
+)""",
+            sql
+            )
+        sql = sqlgen.create_table(sqlgen.DIALECT_MYSQL, Baz)
+        self.assertEquals(
+            """CREATE TABLE baz (
+    baz_id INT AUTO_INCREMENT PRIMARY KEY,
+    i3 INT NOT NULL,
+    s3 VARCHAR(5) NOT NULL UNIQUE
 )""",
             sql
             )

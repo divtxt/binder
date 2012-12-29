@@ -2,7 +2,11 @@
 from binder.col import *
 from binder.table import SqlCondition, SqlSort, AND, OR, QueryCol
 
-_COL_TYPE = {
+
+DIALECT_SQLITE3 = "sqlite3"
+DIALECT_MYSQL = "mysql"
+
+_COL_TYPE_SQLITE3 = {
     AutoIdCol: "INTEGER PRIMARY KEY",
     IntCol: "INTEGER",
     BoolCol: "INTEGER",
@@ -11,11 +15,28 @@ _COL_TYPE = {
     DateTimeUTCCol: "TEXT",
 }
 
-def create_table(table):
+_COL_TYPE_MYSQL = {
+    AutoIdCol: "INT AUTO_INCREMENT PRIMARY KEY",
+    IntCol: "INT",
+    BoolCol: "BOOL",
+    StringCol: "VARCHAR",
+    DateCol: "DATE",
+    DateTimeUTCCol: "DATETIME",
+}
+
+def create_table(dialect, table):
+    if dialect == DIALECT_SQLITE3:
+        col_types = _COL_TYPE_SQLITE3
+    elif dialect == DIALECT_MYSQL:
+        col_types = _COL_TYPE_MYSQL
+    else:
+        assert False, "Unknown dialect: %s" % dialect
     col_defs = []
     for col in table.cols:
-        col_type = _COL_TYPE[col.__class__]
+        col_type = col_types[col.__class__]
         col_def = "%s %s" % (col.col_name, col_type)
+        if col.__class__ is StringCol and dialect != DIALECT_SQLITE3:
+            col_def = "%s(%d)" % (col_def, col.length)
         if col.not_null and not col.__class__ is AutoIdCol:
             col_def = col_def + " NOT NULL"
         if col.__class__ is StringCol and col.unique:
