@@ -3,6 +3,16 @@ from binder import sqlgen
 
 _debug = False
 
+
+READ_COMMITTED = "READ COMMITTED"
+REPEATABLE_READ = "REPEATABLE READ"
+
+_VALID_ISOLATION_LEVELS = [
+    READ_COMMITTED,
+    REPEATABLE_READ,
+    ]
+
+
 class Connection:
 
     def __init__(self, dbconn, dberror, sqlgen_dialect, paramstr, read_only):

@@ -20,3 +20,7 @@ from binder.table import OR
 # Connection object
 from binder.db_sqlite3 import Sqlite3Connection
 from binder.db_mysql import MysqlConnection
+
+# Isolation levels
+from binder.conn import READ_COMMITTED
+from binder.conn import REPEATABLE_READ

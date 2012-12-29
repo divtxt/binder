@@ -17,9 +17,11 @@ MYSQL_TESTDB = {
     "passwd": "binderpassword",
     "db": "bindertestdb",
     }
-def connect_mysql(read_only=None):
+def connect_mysql(read_only=None, isolation_level=None):
     d = dict(MYSQL_TESTDB)
     d['read_only'] = read_only
+    if isolation_level:
+        d['isolation_level'] = isolation_level
     return MysqlConnection(**d)
 
 

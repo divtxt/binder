@@ -3,7 +3,7 @@ import unittest
 
 from binder import *
 
-from bindertest.testdbconfig import connect
+from bindertest.testdbconfig import connect, connect_sqlite3
 
 
 Foo = Table(
@@ -23,14 +23,33 @@ class CommitRollbackTest(unittest.TestCase):
         conn.drop_table_if_exists(Foo)
         conn.create_table(Foo)
 
-    def test_commit(self):
+    def test_commit_read_committed(self):
         foo = Foo.new(foo_id=1, i1=10, s1="xyz")
         conn1 = connect()
-        conn2 = connect()
+        if connect is connect_sqlite3:
+            conn2 = connect()
+        else:
+            conn2 = connect(isolation_level=READ_COMMITTED)
         conn1.insert(Foo, foo)
         self.assertEquals([], conn2.select(Foo))
         conn1.commit()
         self.assertEquals([foo], conn2.select(Foo))
+
+    def test_commit_repeatable_read(self):
+        if connect is connect_sqlite3:
+            return
+        foo = Foo.new(foo_id=1, i1=10, s1="xyz")
+        conn1 = connect()
+        conn2e = connect(isolation_level=REPEATABLE_READ)
+        conn2i = connect() # test default is REPEATABLE_READ
+        conn3 = connect(isolation_level=REPEATABLE_READ)
+        conn1.insert(Foo, foo)
+        self.assertEquals([], conn2e.select(Foo))
+        self.assertEquals([], conn2i.select(Foo))
+        conn1.commit()
+        self.assertEquals([], conn2e.select(Foo))
+        self.assertEquals([], conn2i.select(Foo))
+        self.assertEquals([foo], conn3.select(Foo))
 
     def test_rollback(self):
         foo = Foo.new(foo_id=1, i1=10, s1="xyz")
