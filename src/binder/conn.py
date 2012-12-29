@@ -90,7 +90,7 @@ class Connection:
         # read only check
         self._check_write_ok()
         # gen sql
-        sql, values = sqlgen.update_by_id(table, row)
+        sql, values = sqlgen.update_by_id(table, row, self.paramstr)
         # execute sql
         cursor = self._execute(sql, values)
         rc = cursor.rowcount
@@ -109,7 +109,7 @@ class Connection:
         # read only check
         self._check_write_ok()
         # gen sql
-        sql, values = sqlgen.delete(table, where)
+        sql, values = sqlgen.delete(table, where, self.paramstr)
         # execute sql
         cursor = self._execute(sql, values)
         rowcount = cursor.rowcount
@@ -120,7 +120,7 @@ class Connection:
         # read only check
         self._check_write_ok()
         # gen sql
-        sql, values = sqlgen.delete_by_id(table, row_id)
+        sql, values = sqlgen.delete_by_id(table, row_id, self.paramstr)
         # execute sql
         cursor = self._execute(sql, values)
         rc = cursor.rowcount
@@ -149,7 +149,7 @@ class Connection:
 
     def xselect(self, table, where=None, order_by=None):
         # gen sql
-        sql, values = sqlgen.select(table, where, order_by)
+        sql, values = sqlgen.select(table, where, order_by, self.paramstr)
         # execute sql
         cursor = self._execute(sql, values)
         # result iterator
@@ -181,7 +181,9 @@ class Connection:
 
     def xselect_distinct(self, table, qcol, where=None, order_by=None):
         # gen sql
-        sql, values = sqlgen.select_distinct(table, qcol, where, order_by)
+        sql, values = sqlgen.select_distinct(
+            table, qcol, where, order_by, self.paramstr
+            )
         # execute sql
         cursor = self._execute(sql, values)
         # result iterator

@@ -154,13 +154,13 @@ def delete_by_id(table, row_id, paramstr):
     return sql, values
 
 
-def select(table, where=None, order_by=None):
+def select(table, where, order_by, paramstr):
     col_names = [col.col_name for col in table.cols]
     col_names_sql = ",".join(col_names)
     sql_parts = ["SELECT", col_names_sql, "FROM", table.table_name]
     if where:
         sql_parts.append("WHERE")
-        cond_sql, values = _sqlcond_to_sql(where)
+        cond_sql, values = _sqlcond_to_sql(where, paramstr)
         sql_parts.append(cond_sql)
     else:
         values = []
@@ -171,13 +171,13 @@ def select(table, where=None, order_by=None):
     return sql, values
 
 
-def select_distinct(table, qcol, where=None, order_by=None):
+def select_distinct(table, qcol, where, order_by, paramstr):
     assert isinstance(qcol, QueryCol), "Column must be instance of QueryCol"
     col_name = qcol._col.col_name
     sql_parts = ["SELECT DISTINCT", col_name, "FROM", table.table_name]
     if where:
         sql_parts.append("WHERE")
-        cond_sql, values = _sqlcond_to_sql(where)
+        cond_sql, values = _sqlcond_to_sql(where, paramstr)
         sql_parts.append(cond_sql)
     else:
         values = []
@@ -190,7 +190,7 @@ def select_distinct(table, qcol, where=None, order_by=None):
     return sql, values
 
 
-def _sqlcond_to_sql(where, paramstr="?"):
+def _sqlcond_to_sql(where, paramstr):
     if paramstr == "%s":
         paramstr = "%%s"
     combiner = " AND "

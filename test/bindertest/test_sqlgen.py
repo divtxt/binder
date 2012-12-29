@@ -357,7 +357,7 @@ class DeleteByIdTest(unittest.TestCase):
 class SelectTest(unittest.TestCase):
 
     def test(self):
-        sql, values = sqlgen.select(Foo)
+        sql, values = sqlgen.select(Foo, None, None, "?")
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo",
             sql
@@ -365,33 +365,43 @@ class SelectTest(unittest.TestCase):
         self.assertEquals([], values)
 
     def test_where_eq(self):
-        sql, values = sqlgen.select(Foo, Foo.q.foo_id == 1)
+        sql, values = sqlgen.select(Foo, Foo.q.foo_id == 1, None, "%s")
         self.assertEquals(
-            "SELECT foo_id,i1,s1,d1 FROM foo WHERE foo_id=?",
+            "SELECT foo_id,i1,s1,d1 FROM foo WHERE foo_id=%s",
             sql
             )
         self.assertEquals([1], values)
-        sql, values = sqlgen.select(Bar, Bar.q.bs == 'x')
+        sql, values = sqlgen.select(Bar, Bar.q.bs == 'x', None, "?")
         self.assertEquals(
             "SELECT bi,bs,bd,bdt1,bb FROM bar WHERE bs=?",
             sql
             )
         self.assertEquals(['x'], values)
         #
-        sql, values = sqlgen.select(Bar, Bar.q.bs.LIKE('x%'))
+        sql, values = sqlgen.select(Bar, Bar.q.bs.LIKE('x%'), None, "%s")
         self.assertEquals(
-            "SELECT bi,bs,bd,bdt1,bb FROM bar WHERE bs LIKE ?",
+            "SELECT bi,bs,bd,bdt1,bb FROM bar WHERE bs LIKE %s",
             sql
             )
         self.assertEquals(['x%'], values)
         #
-        sql, values = sqlgen.select(Foo, AND(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'))
+        sql, values = sqlgen.select(
+            Foo,
+            AND(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'),
+            None,
+            "?"
+            )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo WHERE i1=? AND d1 is NULL AND s1=?",
             sql
             )
         self.assertEquals([12, 'y'], values)
-        sql, values = sqlgen.select(Foo, OR(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'))
+        sql, values = sqlgen.select(
+            Foo,
+            OR(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'),
+            None,
+            "?"
+            )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo WHERE i1=? OR d1 is NULL OR s1=?",
             sql
@@ -399,19 +409,21 @@ class SelectTest(unittest.TestCase):
         self.assertEquals([12, 'y'], values)
 
     def test_where_gt_ge_lt_le(self):
-        sql, values = sqlgen.select(Foo, Foo.q.foo_id > 1)
+        sql, values = sqlgen.select(Foo, Foo.q.foo_id > 1, None, "%s")
         self.assertEquals(
-            "SELECT foo_id,i1,s1,d1 FROM foo WHERE foo_id>?",
+            "SELECT foo_id,i1,s1,d1 FROM foo WHERE foo_id>%s",
             sql
             )
         self.assertEquals([1], values)
-        sql, values = sqlgen.select(Bar, Bar.q.bs >= 'x')
+        sql, values = sqlgen.select(Bar, Bar.q.bs >= 'x', None, "%s")
         self.assertEquals(
-            "SELECT bi,bs,bd,bdt1,bb FROM bar WHERE bs>=?",
+            "SELECT bi,bs,bd,bdt1,bb FROM bar WHERE bs>=%s",
             sql
             )
         self.assertEquals(['x'], values)
-        sql, values = sqlgen.select(Foo, AND(Foo.q.i1 < 12, Foo.q.s1 <= 'y'))
+        sql, values = sqlgen.select(
+            Foo, AND(Foo.q.i1 < 12, Foo.q.s1 <= 'y'), None, "?"
+            )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo WHERE i1<? AND s1<=?",
             sql
@@ -420,7 +432,7 @@ class SelectTest(unittest.TestCase):
         # None/NULL
         def check_no_None(cond, opstr):
             try:
-                sqlgen.select(Bar, cond)
+                sqlgen.select(Bar, cond, None, "?")
             except AssertionError, e:
                 self.assertEquals("Op '%s' does not support None" % opstr, str(e))
             else:
@@ -431,14 +443,19 @@ class SelectTest(unittest.TestCase):
         check_no_None(Bar.q.bi <= None, "<=")
         # BoolCol
         try:
-            sqlgen.select(Bar, Bar.q.bb > False)
+            sqlgen.select(Bar, Bar.q.bb > False, None, "?")
         except AssertionError, e:
             self.assertEquals("Op '>' does not support BoolCol", str(e))
         else:
             self.fail()
         # DateTimeUTCCol
         try:
-            sqlgen.select(Bar, Bar.q.bdt1 < datetime.datetime(2007, 5, 23, 0, 42, 12))
+            sqlgen.select(
+                Bar,
+                Bar.q.bdt1 < datetime.datetime(2007, 5, 23, 0, 42, 12),
+                None,
+                "?"
+                )
         except AssertionError, e:
             self.assertEquals("Op '<' does not support DateTimeUTCCol", str(e))
         else:
@@ -449,20 +466,22 @@ class SelectTest(unittest.TestCase):
         from datetime import date
         # non DateCol
         try:
-            sqlgen.select(Foo, Foo.q.i1.YEAR(12))
+            sqlgen.select(Foo, Foo.q.i1.YEAR(12), None, "?")
         except AssertionError, e:
             self.assertEquals("YEAR condition can only be used for DateCol", str(e))
         else:
             self.fail()
         # YEAR / NULL
         try:
-            sqlgen.select(Foo, Foo.q.d1.YEAR(None))
+            sqlgen.select(Foo, Foo.q.d1.YEAR(None), None, "?")
         except AssertionError, e:
             self.assertEquals("YEAR condition cannot use None", str(e))
         else:
             self.fail()
         # YEAR
-        sql, values = sqlgen.select(Foo, Foo.q.d1.YEAR(date(2006,3,14)))
+        sql, values = sqlgen.select(
+            Foo, Foo.q.d1.YEAR(date(2006,3,14)), None, "?"
+            )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo WHERE d1 LIKE ?",
             sql
@@ -473,20 +492,22 @@ class SelectTest(unittest.TestCase):
         from datetime import date
         # non DateCol
         try:
-            sqlgen.select(Foo, Foo.q.i1.YEAR_MONTH(12))
+            sqlgen.select(Foo, Foo.q.i1.YEAR_MONTH(12), None, "?")
         except AssertionError, e:
             self.assertEquals("YEAR_MONTH condition can only be used for DateCol", str(e))
         else:
             self.fail()
         # YEAR / NULL
         try:
-            sqlgen.select(Foo, Foo.q.d1.YEAR_MONTH(None))
+            sqlgen.select(Foo, Foo.q.d1.YEAR_MONTH(None), None, "?")
         except AssertionError, e:
             self.assertEquals("YEAR_MONTH condition cannot use None", str(e))
         else:
             self.fail()
         # YEAR
-        sql, values = sqlgen.select(Foo, Foo.q.d1.YEAR_MONTH(date(2005,7,12)))
+        sql, values = sqlgen.select(
+            Foo, Foo.q.d1.YEAR_MONTH(date(2005,7,12)), None, "?"
+            )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo WHERE d1 LIKE ?",
             sql
@@ -494,13 +515,18 @@ class SelectTest(unittest.TestCase):
         self.assertEquals(["2005-07-%"], values)
     
     def x():
-        sql, values = sqlgen.select(Bar, Bar.q.bs == 'x')
+        sql, values = sqlgen.select(Bar, Bar.q.bs == 'x', None, "?")
         self.assertEquals(
             "SELECT bi,bs,bd FROM bar WHERE bs=?",
             sql
             )
         self.assertEquals(['x'], values)
-        sql, values = sqlgen.select(Foo, AND(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'))
+        sql, values = sqlgen.select(
+            Foo,
+            AND(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'),
+            None,
+            "?"
+            )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo WHERE i1=? AND d1 is NULL AND s1=?",
             sql
@@ -509,14 +535,14 @@ class SelectTest(unittest.TestCase):
 
     def test_order_by(self):
         # ASC
-        sql, values = sqlgen.select(Foo, order_by=Foo.q.foo_id.ASC)
+        sql, values = sqlgen.select(Foo, None, Foo.q.foo_id.ASC, "?")
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo ORDER BY foo_id ASC",
             sql
             )
         self.assertEquals([], values)
         # StringCol default collation NOCASE, DESC
-        sql, values = sqlgen.select(Foo, order_by=Foo.q.s1.DESC)
+        sql, values = sqlgen.select(Foo, None, Foo.q.s1.DESC, "%s")
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo ORDER BY s1 COLLATE NOCASE DESC",
             sql
@@ -527,55 +553,67 @@ class SelectTest(unittest.TestCase):
 class SelectDistinctTest(unittest.TestCase):
 
     def test(self):
-        sql, values = sqlgen.select_distinct(Foo, Foo.q.i1)
+        sql, values = sqlgen.select_distinct(Foo, Foo.q.i1, None, None, "?")
         self.assertEquals(
-                "SELECT DISTINCT i1 FROM foo",
-                sql
+            "SELECT DISTINCT i1 FROM foo",
+            sql
             )
         self.assertEquals([], values)
 
     def test_where(self):
-        sql, values = sqlgen.select_distinct(Foo, Foo.q.s1, Foo.q.foo_id == 1)
+        sql, values = sqlgen.select_distinct(
+            Foo, Foo.q.s1, Foo.q.foo_id == 1, None, "?"
+            )
         self.assertEquals(
-                "SELECT DISTINCT s1 FROM foo WHERE foo_id=?",
-                sql
+            "SELECT DISTINCT s1 FROM foo WHERE foo_id=?",
+            sql
             )
         self.assertEquals([1], values)
         #
         sql, values = sqlgen.select_distinct(
-                Foo,
-                Foo.q.d1,
-                AND(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y')
+            Foo,
+            Foo.q.d1,
+            AND(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'),
+            None,
+            "%s"
             )
         self.assertEquals(
-                "SELECT DISTINCT d1 FROM foo WHERE i1=? AND d1 is NULL AND s1=?",
-                sql
+            "SELECT DISTINCT d1 FROM foo WHERE i1=%s AND d1 is NULL AND s1=%s",
+            sql
             )
         self.assertEquals([12, 'y'], values)
         #
         sql, values = sqlgen.select_distinct(
-                Foo,
-                Foo.q.d1,
-                OR(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y')
+            Foo,
+            Foo.q.d1,
+            OR(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'),
+            None,
+            "?"
             )
         self.assertEquals(
-                "SELECT DISTINCT d1 FROM foo WHERE i1=? OR d1 is NULL OR s1=?",
-                sql
+            "SELECT DISTINCT d1 FROM foo WHERE i1=? OR d1 is NULL OR s1=?",
+            sql
             )
         self.assertEquals([12, 'y'], values)
 
     def test_order_by(self):
-        sql, values = sqlgen.select_distinct(Foo, Foo.q.foo_id, order_by=Foo.q.foo_id.ASC)
+        sql, values = sqlgen.select_distinct(
+            Foo, Foo.q.foo_id, None, Foo.q.foo_id.ASC, "?"
+            )
         self.assertEquals(
-                "SELECT DISTINCT foo_id FROM foo ORDER BY foo_id ASC",
-                sql
+            "SELECT DISTINCT foo_id FROM foo ORDER BY foo_id ASC",
+            sql
             )
 
     def test_order_by_different_col(self):
         try:
-            sqlgen.select_distinct(Foo, Foo.q.i1, order_by=Foo.q.s1.ASC)
+            sqlgen.select_distinct(
+                Foo, Foo.q.i1, None, Foo.q.s1.ASC, "?"
+                )
         except AssertionError, e:
-            self.assertEquals("SELECT DISTINCT column must match 'order_by' column", str(e))
+            self.assertEquals(
+                "SELECT DISTINCT column must match 'order_by' column", str(e)
+                )
         else:
             self.fail()
 
