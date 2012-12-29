@@ -244,9 +244,9 @@ class UpdateByIdTest(unittest.TestCase):
 
     def test(self):
         foo = Foo.new(foo_id=4, i1=23, s1="pqr", d1=datetime.date(2006, 5, 4))
-        sql, values = sqlgen.update_by_id(Foo, foo)
+        sql, values = sqlgen.update_by_id(Foo, foo, "%s")
         self.assertEquals(
-            "UPDATE foo SET i1=?,s1=?,d1=? WHERE foo_id=?",
+            "UPDATE foo SET i1=%s,s1=%s,d1=%s WHERE foo_id=%s",
             sql
             )
         self.assertEquals([23, u"pqr", "2006-05-04", 4], values)
@@ -254,7 +254,7 @@ class UpdateByIdTest(unittest.TestCase):
     def test_no_auto_id_col(self):
         bar = Bar.new(bi=5, bs="abc", bd=datetime.date(2006, 3, 21))
         try:
-            sqlgen.update_by_id(Bar, bar)
+            sqlgen.update_by_id(Bar, bar, "?")
         except AssertionError, e:
             self.assertEquals("update_by_id(): table 'bar' does not have AutoIdCol", str(e))
         else:
@@ -263,7 +263,7 @@ class UpdateByIdTest(unittest.TestCase):
     def test_auto_id(self):
         foo = Foo.new(foo_id=None, i1=25, s1="xyz")
         try:
-            sqlgen.update_by_id(Foo, foo)
+            sqlgen.update_by_id(Foo, foo, "?")
         except AssertionError, e:
             self.assertEquals("update_by_id(): cannot use None for AutoIdCol", str(e))
         else:
@@ -274,7 +274,7 @@ class UpdateByIdTest(unittest.TestCase):
         foo["foo_id"] = 6
         foo["i1"] = "xyz"
         try:
-            sqlgen.update_by_id(Foo, foo)
+            sqlgen.update_by_id(Foo, foo, "?")
         except TypeError, e:
             self.assertEquals("IntCol 'i1': int expected, got str", str(e))
         else:
@@ -286,29 +286,35 @@ class DeleteTest(unittest.TestCase):
 
     def test(self):
         # AutoIdCol
-        sql, values = sqlgen.delete(Foo, Foo.q.foo_id == 2)
+        sql, values = sqlgen.delete(Foo, Foo.q.foo_id == 2, "?")
         self.assertEquals("DELETE FROM foo WHERE foo_id=?", sql)
         self.assertEquals([2], values)
         # StringCol
-        sql, values = sqlgen.delete(Foo, Foo.q.i1 == 32)
-        self.assertEquals("DELETE FROM foo WHERE i1=?", sql)
+        sql, values = sqlgen.delete(Foo, Foo.q.i1 == 32, "%s")
+        self.assertEquals("DELETE FROM foo WHERE i1=%s", sql)
         self.assertEquals([32], values)
         # IntCol AND StringCol
-        sql, values = sqlgen.delete(Foo, AND(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"))
+        sql, values = sqlgen.delete(
+            Foo, AND(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"), "?"
+            )
         self.assertEquals("DELETE FROM foo WHERE i1=? AND s1=?", sql)
         self.assertEquals([12, "aeiou"], values)
         # IntCol AND DateCol / NULL
-        sql, values = sqlgen.delete(Bar, AND(Bar.q.bi == 12, Bar.q.bd == None))
-        self.assertEquals("DELETE FROM bar WHERE bi=? AND bd is NULL", sql)
+        sql, values = sqlgen.delete(
+            Bar, AND(Bar.q.bi == 12, Bar.q.bd == None), "%s"
+            )
+        self.assertEquals("DELETE FROM bar WHERE bi=%s AND bd is NULL", sql)
         self.assertEquals([12], values)
         # IntCol OR StringCol
-        sql, values = sqlgen.delete(Foo, OR(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"))
+        sql, values = sqlgen.delete(
+            Foo, OR(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"), "?"
+            )
         self.assertEquals("DELETE FROM foo WHERE i1=? OR s1=?", sql)
         self.assertEquals([12, "aeiou"], values)
 
     def test_bad_values(self):
         try:
-            sqlgen.delete(Foo, Foo.q.i1 == "xyz")
+            sqlgen.delete(Foo, Foo.q.i1 == "xyz", "?")
         except TypeError, e:
             self.assertEquals("IntCol 'i1': int expected, got str", str(e))
         else:
@@ -318,13 +324,13 @@ class DeleteTest(unittest.TestCase):
 class DeleteByIdTest(unittest.TestCase):
 
     def test(self):
-        sql, values = sqlgen.delete_by_id(Foo, 4)
-        self.assertEquals("DELETE FROM foo WHERE foo_id=?", sql)
+        sql, values = sqlgen.delete_by_id(Foo, 4, "%s")
+        self.assertEquals("DELETE FROM foo WHERE foo_id=%s", sql)
         self.assertEquals([4], values)
 
     def test_no_auto_id_col(self):
         try:
-            sql = sqlgen.delete_by_id(Bar, 3)
+            sql = sqlgen.delete_by_id(Bar, 3, "?")
         except AssertionError, e:
             self.assertEquals("delete_by_id(): table 'bar' does not have AutoIdCol", str(e))
         else:
@@ -332,7 +338,7 @@ class DeleteByIdTest(unittest.TestCase):
 
     def test_auto_id(self):
         try:
-            sqlgen.delete_by_id(Foo, None)
+            sqlgen.delete_by_id(Foo, None, "?")
         except AssertionError, e:
             self.assertEquals("delete_by_id(): cannot use None for AutoIdCol", str(e))
         else:
@@ -340,7 +346,7 @@ class DeleteByIdTest(unittest.TestCase):
 
     def test_bad_values(self):
         try:
-            sqlgen.delete_by_id(Foo, '4')
+            sqlgen.delete_by_id(Foo, '4', "?")
         except TypeError, e:
             self.assertEquals("AutoIdCol 'foo_id': int expected, got str", str(e))
         else:

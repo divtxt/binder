@@ -108,7 +108,7 @@ def update(table, row, where, paramstr):
     return sql, values
 
 
-def update_by_id(table, row):
+def update_by_id(table, row, paramstr):
     assert table.auto_id_col, \
         "update_by_id(): table '%s' does not have AutoIdCol" \
             % table.table_name
@@ -128,28 +128,28 @@ def update_by_id(table, row):
             value = col.py_to_db(value)
             values.append(value)
     values.append(row_id)
-    col_sqls = [(col_name + "=?") for col_name in col_names]
+    col_sqls = [(col_name + "=" + paramstr) for col_name in col_names]
     col_sql = ",".join(col_sqls)
     sql = "UPDATE %s SET %s" % (table.table_name, col_sql)
-    sql = "%s WHERE %s=?" % (sql, auto_id_col.col_name)
+    sql = "%s WHERE %s=%s" % (sql, auto_id_col.col_name, paramstr)
     return sql, values
 
 
-def delete(table, where):
-    cond_sql, values = _sqlcond_to_sql(where)
+def delete(table, where, paramstr):
+    cond_sql, values = _sqlcond_to_sql(where, paramstr)
     sql = "DELETE FROM %s WHERE %s" % (table.table_name, cond_sql)
     return sql, values
 
 
-def delete_by_id(table, row_id):
+def delete_by_id(table, row_id, paramstr):
     assert table.auto_id_col, \
         "delete_by_id(): table '%s' does not have AutoIdCol" \
             % table.table_name
     assert not row_id is None, "delete_by_id(): cannot use None for AutoIdCol"
     auto_id_col = table.auto_id_col
     auto_id_col.check_value(row_id)
-    sql = "DELETE FROM %s WHERE %s=?" \
-        % (table.table_name, auto_id_col.col_name)
+    sql = "DELETE FROM %s WHERE %s=%s" \
+        % (table.table_name, auto_id_col.col_name, paramstr)
     values = [row_id]
     return sql, values
 
