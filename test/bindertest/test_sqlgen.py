@@ -153,49 +153,57 @@ class UpdateTest(unittest.TestCase):
                 bb=True
             )
         # no where condition
-        sql, values = sqlgen.update(Foo, foo, None)
+        sql, values = sqlgen.update(Foo, foo, None, "?")
         self.assertEquals(
             "UPDATE foo SET foo_id=?,i1=?,s1=?,d1=?",
             sql
             )
         self.assertEquals([4, 23, u"pqr", "2006-05-04"], values)
         # AutoIdCol
-        sql, values = sqlgen.update(Foo, foo, Foo.q.foo_id == 2)
+        sql, values = sqlgen.update(Foo, foo, Foo.q.foo_id == 2, "%s")
         self.assertEquals(
-            "UPDATE foo SET foo_id=?,i1=?,s1=?,d1=? WHERE foo_id=?",
+            "UPDATE foo SET foo_id=%s,i1=%s,s1=%s,d1=%s WHERE foo_id=%s",
             sql
             )
         self.assertEquals([4, 23, u"pqr", "2006-05-04", 2], values)
         # IntCol
-        sql, values = sqlgen.update(Foo, foo, Foo.q.i1 == 32)
+        sql, values = sqlgen.update(Foo, foo, Foo.q.i1 == 32, "?")
         self.assertEquals(
             "UPDATE foo SET foo_id=?,i1=?,s1=?,d1=? WHERE i1=?",
             sql
             )
         self.assertEquals([4, 23, u"pqr", "2006-05-04", 32], values)
         # IntCol AND StringCol
-        sql, values = sqlgen.update(Foo, foo, AND(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"))
+        sql, values = sqlgen.update(
+            Foo, foo, AND(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"), "%s"
+            )
         self.assertEquals(
-            "UPDATE foo SET foo_id=?,i1=?,s1=?,d1=? WHERE i1=? AND s1=?",
+            "UPDATE foo SET foo_id=%s,i1=%s,s1=%s,d1=%s WHERE i1=%s AND s1=%s",
             sql
             )
         self.assertEquals([4, 23, u"pqr", "2006-05-04", 12, "aeiou"], values)
         # IntCol AND DateCol / NULL
-        sql, values = sqlgen.update(Bar, bar, AND(Bar.q.bi == 12, Bar.q.bd == None))
+        sql, values = sqlgen.update(
+                Bar, bar, AND(Bar.q.bi == 12, Bar.q.bd == None), "?"
+                )
         self.assertEquals(
             "UPDATE bar SET bi=?,bs=?,bd=?,bdt1=?,bb=? WHERE bi=? AND bd is NULL",
             sql
             )
         self.assertEquals([5, u"abc", "2006-03-21", "2005-11-22T00:43:12Z", 1, 12], values)
         # IntCol OR StringCol
-        sql, values = sqlgen.update(Foo, foo, OR(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"))
+        sql, values = sqlgen.update(
+            Foo, foo, OR(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"), "%s"
+            )
         self.assertEquals(
-            "UPDATE foo SET foo_id=?,i1=?,s1=?,d1=? WHERE i1=? OR s1=?",
+            "UPDATE foo SET foo_id=%s,i1=%s,s1=%s,d1=%s WHERE i1=%s OR s1=%s",
             sql
             )
         self.assertEquals([4, 23, u"pqr", "2006-05-04", 12, "aeiou"], values)
         # IntCol OR DateCol / NULL
-        sql, values = sqlgen.update(Bar, bar, OR(Bar.q.bi == 12, Bar.q.bd == None))
+        sql, values = sqlgen.update(
+            Bar, bar, OR(Bar.q.bi == 12, Bar.q.bd == None), "?"
+            )
         self.assertEquals(
             "UPDATE bar SET bi=?,bs=?,bd=?,bdt1=?,bb=? WHERE bi=? OR bd is NULL",
             sql
@@ -204,9 +212,9 @@ class UpdateTest(unittest.TestCase):
 
     def test_null(self):
         foo = Foo.new(foo_id=4, i1=23, s1="pqr", d1=None)
-        sql, values = sqlgen.update(Foo, foo, Foo.q.i1 == 434)
+        sql, values = sqlgen.update(Foo, foo, Foo.q.i1 == 434, "%s")
         self.assertEquals(
-            "UPDATE foo SET foo_id=?,i1=?,s1=?,d1=NULL WHERE i1=?",
+            "UPDATE foo SET foo_id=%s,i1=%s,s1=%s,d1=NULL WHERE i1=%s",
             sql
             )
         self.assertEquals([4, 23, u"pqr", 434], values)
@@ -214,7 +222,7 @@ class UpdateTest(unittest.TestCase):
     def test_auto_id(self):
         foo = Foo.new(foo_id=None, i1=25, s1="xyz")
         try:
-            sqlgen.update(Foo, foo, Foo.q.i1 == 12)
+            sqlgen.update(Foo, foo, Foo.q.i1 == 12, "?")
         except AssertionError, e:
             self.assertEquals("update(): cannot use None for AutoIdCol", str(e))
         else:
@@ -225,7 +233,7 @@ class UpdateTest(unittest.TestCase):
         foo["foo_id"] = 6
         foo["i1"] = "xyz"
         try:
-            sqlgen.update(Foo, foo, Foo.q.i1 == 23)
+            sqlgen.update(Foo, foo, Foo.q.i1 == 23, "?")
         except TypeError, e:
             self.assertEquals("IntCol 'i1': int expected, got str", str(e))
         else:

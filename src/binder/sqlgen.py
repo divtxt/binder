@@ -81,7 +81,7 @@ def insert(table, row):
     return sql, values, auto_id_used
 
 
-def update(table, row, where):
+def update(table, row, where, paramstr):
     values = []
     col_names = []
     auto_id_col = table.auto_id_col
@@ -94,13 +94,13 @@ def update(table, row, where):
                 "update(): cannot use None for AutoIdCol"
             col_names.append(col_name + "=NULL")
         else:
-            col_names.append(col_name + "=?")
+            col_names.append(col_name + "=" + paramstr)
             value = col.py_to_db(value)
             values.append(value)
     col_sql = ",".join(col_names)
     sql_parts = ["UPDATE", table.table_name, "SET", col_sql]
     if not where is None:
-        cond_sql, where_values = _sqlcond_to_sql(where)
+        cond_sql, where_values = _sqlcond_to_sql(where, paramstr)
         sql_parts.append("WHERE")
         sql_parts.append(cond_sql)
         values.extend(where_values)
@@ -190,7 +190,9 @@ def select_distinct(table, qcol, where=None, order_by=None):
     return sql, values
 
 
-def _sqlcond_to_sql(where):
+def _sqlcond_to_sql(where, paramstr="?"):
+    if paramstr == "%s":
+        paramstr = "%%s"
     combiner = " AND "
     if isinstance(where, SqlCondition):
         sqlconds = [where]
@@ -208,7 +210,7 @@ def _sqlcond_to_sql(where):
             if sqlcond.other == None:
                 cond_sql = "%s is NULL"
             else:
-                cond_sql = "%s=?"
+                cond_sql = "%s=" + paramstr
                 value = sqlcond.col.py_to_db(sqlcond.other)
                 values.append(value)
         elif sqlcond.op in [">", ">=", "<", "<="]:
@@ -218,7 +220,7 @@ def _sqlcond_to_sql(where):
                 "Op '%s' does not support DateTimeUTCCol" % sqlcond.op
             assert not sqlcond.other is None, \
                 "Op '%s' does not support None" % sqlcond.op
-            cond_sql = "%%s%s?" % sqlcond.op
+            cond_sql = "%s" + sqlcond.op + paramstr
             value = sqlcond.col.py_to_db(sqlcond.other)
             values.append(value)
         elif sqlcond.op == "YEAR":
@@ -226,7 +228,7 @@ def _sqlcond_to_sql(where):
                 "YEAR condition can only be used for DateCol"
             assert sqlcond.other != None, \
                 "YEAR condition cannot use None"
-            cond_sql = "%s LIKE ?"
+            cond_sql = "%s LIKE " + paramstr
             value = "%d-%%" % sqlcond.other.year
             values.append(value)
         elif sqlcond.op == "YEAR_MONTH":
@@ -234,7 +236,7 @@ def _sqlcond_to_sql(where):
                 "YEAR_MONTH condition can only be used for DateCol"
             assert sqlcond.other != None, \
                 "YEAR_MONTH condition cannot use None"
-            cond_sql = "%s LIKE ?"
+            cond_sql = "%s LIKE " + paramstr
             value = "%d-%02d-%%" % (sqlcond.other.year, sqlcond.other.month)
             values.append(value)
         elif sqlcond.op == "LIKE":
@@ -242,7 +244,7 @@ def _sqlcond_to_sql(where):
                 "LIKE condition can only be used for StringCol"
             assert sqlcond.other != None, \
                 "LIKE condition cannot use None"
-            cond_sql = "%s LIKE ?"
+            cond_sql = "%s LIKE " + paramstr
             value = sqlcond.other
             values.append(value)
         else:
