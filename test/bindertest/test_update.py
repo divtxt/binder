@@ -133,7 +133,13 @@ class ConnUpdateTest(unittest.TestCase):
         try:
             conn.update(Baz, baz3, Baz.q.i3 == 42)
         except conn.DbError, e:
-            self.assertEquals("column s3 is not unique", str(e))
+            self.assertIn(
+                e.args,
+                [
+                    ("column s3 is not unique",),
+                    (1062, "Duplicate entry \'beta\' for key \'s3\'"),
+                    ]
+                )
         else:
             self.fail()
 
