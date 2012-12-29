@@ -48,7 +48,13 @@ class ConnInsertTest(unittest.TestCase):
         try:
             conn.insert(Foo, foo)
         except conn.DbError, e:
-            self.assertEquals("PRIMARY KEY must be unique", str(e))
+            self.assertIn(
+                e.args,
+                [
+                    "PRIMARY KEY must be unique",
+                    (1062, "Duplicate entry \'1\' for key \'PRIMARY\'"),
+                    ]
+                )
         else:
             self.fail()
 
@@ -62,7 +68,13 @@ class ConnInsertTest(unittest.TestCase):
         try:
             conn.insert(Baz, baz2)
         except conn.DbError, e:
-            self.assertEquals("column s3 is not unique", str(e))
+            self.assertIn(
+                e.args,
+                [
+                    "column s3 is not unique",
+                    (1062, "Duplicate entry \'gamma\' for key \'s3\'"),
+                    ]
+                )
         else:
             self.fail()
 
@@ -76,7 +88,13 @@ class ConnInsertTest(unittest.TestCase):
         try:
             conn.insert(Baz, baz2)
         except conn.DbError, e:
-            self.assertEquals("column s3 is not unique", str(e))
+            self.assertIn(
+                e.args,
+                [
+                    "column s3 is not unique",
+                    (1062, "Duplicate entry \'\' for key \'s3\'"),
+                    ]
+                )
         else:
             self.fail()
 

@@ -111,7 +111,13 @@ class ConnUpdateTest(unittest.TestCase):
         try:
             conn.update(Foo, foo4a, Foo.q.s1 == "alpha")
         except conn.DbError, e:
-            self.assertEquals("PRIMARY KEY must be unique", str(e))
+            self.assertIn(
+                e.args,
+                [
+                    "PRIMARY KEY must be unique",
+                    (1062, "Duplicate entry \'4\' for key \'PRIMARY\'"),
+                    ]
+                )
         else:
             self.fail()
 
