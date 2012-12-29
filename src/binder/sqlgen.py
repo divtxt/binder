@@ -87,7 +87,7 @@ def insert(table, row, paramstr):
     return sql, values, auto_id_used
 
 
-def update(table, row, where, paramstr):
+def update(table, row, where, dialect, paramstr):
     values = []
     col_names = []
     auto_id_col = table.auto_id_col
@@ -106,7 +106,7 @@ def update(table, row, where, paramstr):
     col_sql = ",".join(col_names)
     sql_parts = ["UPDATE", table.table_name, "SET", col_sql]
     if not where is None:
-        cond_sql, where_values = _sqlcond_to_sql(where, paramstr)
+        cond_sql, where_values = _sqlcond_to_sql(where, dialect, paramstr)
         sql_parts.append("WHERE")
         sql_parts.append(cond_sql)
         values.extend(where_values)
@@ -141,8 +141,8 @@ def update_by_id(table, row, paramstr):
     return sql, values
 
 
-def delete(table, where, paramstr):
-    cond_sql, values = _sqlcond_to_sql(where, paramstr)
+def delete(table, where, dialect, paramstr):
+    cond_sql, values = _sqlcond_to_sql(where, dialect, paramstr)
     sql = "DELETE FROM %s WHERE %s" % (table.table_name, cond_sql)
     return sql, values
 
@@ -160,13 +160,13 @@ def delete_by_id(table, row_id, paramstr):
     return sql, values
 
 
-def select(table, where, order_by, paramstr):
+def select(table, where, order_by, dialect, paramstr):
     col_names = [col.col_name for col in table.cols]
     col_names_sql = ",".join(col_names)
     sql_parts = ["SELECT", col_names_sql, "FROM", table.table_name]
     if where:
         sql_parts.append("WHERE")
-        cond_sql, values = _sqlcond_to_sql(where, paramstr)
+        cond_sql, values = _sqlcond_to_sql(where, dialect, paramstr)
         sql_parts.append(cond_sql)
     else:
         values = []
@@ -177,13 +177,13 @@ def select(table, where, order_by, paramstr):
     return sql, values
 
 
-def select_distinct(table, qcol, where, order_by, paramstr):
+def select_distinct(table, qcol, where, order_by, dialect, paramstr):
     assert isinstance(qcol, QueryCol), "Column must be instance of QueryCol"
     col_name = qcol._col.col_name
     sql_parts = ["SELECT DISTINCT", col_name, "FROM", table.table_name]
     if where:
         sql_parts.append("WHERE")
-        cond_sql, values = _sqlcond_to_sql(where, paramstr)
+        cond_sql, values = _sqlcond_to_sql(where, dialect, paramstr)
         sql_parts.append(cond_sql)
     else:
         values = []
@@ -196,7 +196,7 @@ def select_distinct(table, qcol, where, order_by, paramstr):
     return sql, values
 
 
-def _sqlcond_to_sql(where, paramstr):
+def _sqlcond_to_sql(where, dialect, paramstr):
     if paramstr == "%s":
         paramstr = "%%s"
     combiner = " AND "
@@ -234,16 +234,29 @@ def _sqlcond_to_sql(where, paramstr):
                 "YEAR condition can only be used for DateCol"
             assert sqlcond.other != None, \
                 "YEAR condition cannot use None"
-            cond_sql = "%s LIKE " + paramstr
-            value = "%d-%%" % sqlcond.other.year
+            if dialect == DIALECT_SQLITE3:
+                cond_sql = "%s LIKE " + paramstr
+                value = "%d-%%" % sqlcond.other.year
+            elif dialect == DIALECT_MYSQL:
+                cond_sql = "YEAR(%s)=" + paramstr
+                value = sqlcond.other.year
+            else:
+                raise Exception, ("Unknown dialect", dialect)
             values.append(value)
         elif sqlcond.op == "YEAR_MONTH":
             assert isinstance(sqlcond.col, DateCol), \
                 "YEAR_MONTH condition can only be used for DateCol"
             assert sqlcond.other != None, \
                 "YEAR_MONTH condition cannot use None"
-            cond_sql = "%s LIKE " + paramstr
-            value = "%d-%02d-%%" % (sqlcond.other.year, sqlcond.other.month)
+            if dialect == DIALECT_SQLITE3:
+                cond_sql = "%s LIKE " + paramstr
+                value = "%d-%02d-%%" % (sqlcond.other.year, sqlcond.other.month)
+            elif dialect == DIALECT_MYSQL:
+                # FIXME
+                cond_sql = "EXTRACT(YEAR_MONTH FROM %s)=" + paramstr
+                value = "%d%02d" % (sqlcond.other.year, sqlcond.other.month)
+            else:
+                raise Exception, ("Unknown dialect", dialect)
             values.append(value)
         elif sqlcond.op == "LIKE":
             assert isinstance(sqlcond.col, UnicodeCol), \

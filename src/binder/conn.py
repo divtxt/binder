@@ -15,13 +15,13 @@ _VALID_ISOLATION_LEVELS = [
 
 class Connection:
 
-    def __init__(self, dbconn, dberror, sqlgen_dialect, paramstr, read_only):
+    def __init__(self, dbconn, dberror, dialect, paramstr, read_only):
         self._is_open = True
         self._dbconn = dbconn
         self._last_ri = None
         self._read_only = read_only
         self.DbError = dberror
-        self.sqlgen_dialect = sqlgen_dialect
+        self.dialect = dialect
         self.paramstr = paramstr
 
 
@@ -61,7 +61,7 @@ class Connection:
         # read only check
         self._check_write_ok()
         #
-        sql = sqlgen.create_table(self.sqlgen_dialect, table)
+        sql = sqlgen.create_table(self.dialect, table)
         self._execute(sql)
 
     def drop_table(self, table, if_exists=False):
@@ -93,7 +93,9 @@ class Connection:
         # read only check
         self._check_write_ok()
         # gen sql
-        sql, values = sqlgen.update(table, row, where, self.paramstr)
+        sql, values = sqlgen.update(
+            table, row, where, self.dialect, self.paramstr
+            )
         # execute sql
         cursor = self._execute(sql, values)
         rowcount = cursor.rowcount
@@ -123,7 +125,9 @@ class Connection:
         # read only check
         self._check_write_ok()
         # gen sql
-        sql, values = sqlgen.delete(table, where, self.paramstr)
+        sql, values = sqlgen.delete(
+            table, where, self.dialect, self.paramstr
+            )
         # execute sql
         cursor = self._execute(sql, values)
         rowcount = cursor.rowcount
@@ -163,7 +167,9 @@ class Connection:
 
     def xselect(self, table, where=None, order_by=None):
         # gen sql
-        sql, values = sqlgen.select(table, where, order_by, self.paramstr)
+        sql, values = sqlgen.select(
+            table, where, order_by, self.dialect, self.paramstr
+            )
         # execute sql
         cursor = self._execute(sql, values)
         # result iterator
@@ -196,7 +202,7 @@ class Connection:
     def xselect_distinct(self, table, qcol, where=None, order_by=None):
         # gen sql
         sql, values = sqlgen.select_distinct(
-            table, qcol, where, order_by, self.paramstr
+            table, qcol, where, order_by, self.dialect, self.paramstr
             )
         # execute sql
         cursor = self._execute(sql, values)

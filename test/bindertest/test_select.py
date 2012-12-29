@@ -4,7 +4,7 @@ import unittest
 from binder import *
 import datetime
 
-from bindertest.testdbconfig import connect
+from bindertest.testdbconfig import connect, connect_mysql
 from bindertest.tabledefs import Foo
 
 
