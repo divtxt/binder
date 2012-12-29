@@ -17,7 +17,7 @@ class CreateTableTest(unittest.TestCase):
             """CREATE TABLE foo (
     foo_id INTEGER PRIMARY KEY,
     i1 INTEGER NOT NULL,
-    s1 TEXT NOT NULL,
+    s1 TEXT NOT NULL COLLATE NOCASE,
     d1 TEXT
 )""",
             sql
@@ -27,7 +27,7 @@ class CreateTableTest(unittest.TestCase):
             """CREATE TABLE foo (
     foo_id INT AUTO_INCREMENT PRIMARY KEY,
     i1 INT NOT NULL,
-    s1 VARCHAR(10) NOT NULL,
+    s1 VARCHAR(10) NOT NULL COLLATE NOCASE,
     d1 DATE
 )""",
             sql
@@ -541,10 +541,10 @@ class SelectTest(unittest.TestCase):
             sql
             )
         self.assertEquals([], values)
-        # StringCol default collation NOCASE, DESC
+        # DESC
         sql, values = sqlgen.select(Foo, None, Foo.q.s1.DESC, "%s")
         self.assertEquals(
-            "SELECT foo_id,i1,s1,d1 FROM foo ORDER BY s1 COLLATE NOCASE DESC",
+            "SELECT foo_id,i1,s1,d1 FROM foo ORDER BY s1 DESC",
             sql
             )
         self.assertEquals([], values)

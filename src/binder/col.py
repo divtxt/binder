@@ -134,12 +134,13 @@ class BoolCol(ColBase):
 class StringCol(ColBase):
     "String column."
 
-    def __init__(self, col_name, length, unique=False):
+    def __init__(self, col_name, length, unique=False, collate_nocase=False):
         assert type(length) is int, "length must be int"
         assert length > 0, "length must be > 0"
         ColBase.__init__(self, col_name, True, unicode, "")
         self.length = length
         self.unique = unique
+        self.collate_nocase = collate_nocase
 
     def check_value(self, value):
         if not type(value) is str:

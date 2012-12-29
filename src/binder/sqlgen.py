@@ -39,8 +39,11 @@ def create_table(dialect, table):
             col_def = "%s(%d)" % (col_def, col.length)
         if col.not_null and not col.__class__ is AutoIdCol:
             col_def = col_def + " NOT NULL"
-        if col.__class__ is StringCol and col.unique:
-            col_def = col_def + " UNIQUE"
+        if col.__class__ is StringCol:
+            if col.unique:
+                col_def = col_def + " UNIQUE"
+            if col.collate_nocase:
+                col_def = col_def + " COLLATE NOCASE"
         col_defs.append(col_def)
     cols_sql = ",\n    ".join(col_defs)
     sql = "CREATE TABLE %s (\n    %s\n)" \
@@ -257,8 +260,6 @@ def _sqlcond_to_sql(where, paramstr):
 def _sqlsort_to_sql(order_by):
     assert isinstance(order_by, SqlSort), "'order_by' must be SqlSort"
     sql = order_by.col.col_name
-    if isinstance(order_by.col, StringCol):
-        sql = sql + " COLLATE NOCASE"
     if order_by.asc:
         sql = sql + " ASC"
     else:

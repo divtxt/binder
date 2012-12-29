@@ -8,7 +8,7 @@ Foo = Table(
     "foo",
     AutoIdCol("foo_id"),
     IntCol("i1"),
-    StringCol("s1", 10),
+    StringCol("s1", 10, collate_nocase=True),
     DateCol("d1"),
 )
 
