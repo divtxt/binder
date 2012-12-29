@@ -55,7 +55,7 @@ def drop_table(table, if_exists):
 
 
 
-def insert(table, row):
+def insert(table, row, paramstr):
     values = []
     col_names = []
     value_qs = []
@@ -71,7 +71,7 @@ def insert(table, row):
             if col is auto_id_col:
                 auto_id_used = True
         else:
-            value_qs.append('?')
+            value_qs.append(paramstr)
             value = col.py_to_db(value)
             values.append(value)
     col_names_sql = ",".join(col_names)

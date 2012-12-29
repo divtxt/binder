@@ -87,7 +87,7 @@ class InsertTest(unittest.TestCase):
 
     def test(self):
         foo = Foo.new(foo_id=4, i1=23, s1="pqr", d1=datetime.date(2006, 5, 4))
-        sql, values, auto_id_used = sqlgen.insert(Foo, foo)
+        sql, values, auto_id_used = sqlgen.insert(Foo, foo, "?")
         self.assertEquals(
             "INSERT INTO foo (foo_id,i1,s1,d1) VALUES (?,?,?,?)",
             sql
@@ -101,9 +101,9 @@ class InsertTest(unittest.TestCase):
                 bdt1=datetime.datetime(2006, 4, 13, 23, 58, 14),
                 bb=True
             )
-        sql, values, auto_id_used = sqlgen.insert(Bar, bar)
+        sql, values, auto_id_used = sqlgen.insert(Bar, bar, "%s")
         self.assertEquals(
-            "INSERT INTO bar (bi,bs,bd,bdt1,bb) VALUES (?,?,?,?,?)",
+            "INSERT INTO bar (bi,bs,bd,bdt1,bb) VALUES (%s,%s,%s,%s,%s)",
             sql
             )
         self.assertEquals(
@@ -114,7 +114,7 @@ class InsertTest(unittest.TestCase):
 
     def test_auto_id(self):
         foo = Foo.new(foo_id=None, i1=25, s1="xyz")
-        sql, values, auto_id_used = sqlgen.insert(Foo, foo)
+        sql, values, auto_id_used = sqlgen.insert(Foo, foo, "?")
         self.assertEquals(
             "INSERT INTO foo (foo_id,i1,s1,d1) VALUES (NULL,?,?,NULL)",
             sql
@@ -124,9 +124,9 @@ class InsertTest(unittest.TestCase):
 
     def test_auto_id_used(self):
         foo = Foo.new(foo_id=12, i1=101, s1="xyz", d1=None)
-        sql, values, auto_id_used = sqlgen.insert(Foo, foo)
+        sql, values, auto_id_used = sqlgen.insert(Foo, foo, "%s")
         self.assertEquals(
-            "INSERT INTO foo (foo_id,i1,s1,d1) VALUES (?,?,?,NULL)",
+            "INSERT INTO foo (foo_id,i1,s1,d1) VALUES (%s,%s,%s,NULL)",
             sql
             )
         self.assertEquals([12, 101, "xyz"], values)
@@ -136,7 +136,7 @@ class InsertTest(unittest.TestCase):
         foo = Foo.new()
         foo["i1"] = "xyz"
         try:
-            sqlgen.insert(Foo, foo)
+            sqlgen.insert(Foo, foo, "?")
         except TypeError, e:
             self.assertEquals("IntCol 'i1': int expected, got str", str(e))
         else:
