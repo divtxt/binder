@@ -20,7 +20,7 @@ _NO_TABLE_FOO = [
     ]
 
 _TABLE_FOO_EXISTS = [
-    ("table foo already exists"),           # sqlite3
+    ("table foo already exists",),          # sqlite3
     (1050, "Table \'foo\' already exists"), # MySQL
     ]
 
@@ -50,6 +50,11 @@ class CreateDropTest(unittest.TestCase):
             self.assertIn(e.args, _NO_TABLE_FOO)
 
     def test_drop_if_exists(self):
+        conn = connect()
+        try:
+            conn.drop_table(Foo)
+        except conn.DbError, e:
+            self.assertIn(e.args, _NO_TABLE_FOO)
         conn = connect()
         conn.create_table(Foo)
         conn = connect()
