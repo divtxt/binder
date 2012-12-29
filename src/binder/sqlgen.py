@@ -39,6 +39,7 @@ def create_table(dialect, table):
         col_def = "%s %s" % (col.col_name, col_type)
         if col.__class__ is StringCol and dialect != DIALECT_SQLITE3:
             col_def = "%s(%d)" % (col_def, col.length)
+            col_def = col_def + " CHARACTER SET utf8"
         if col.not_null and not col.__class__ is AutoIdCol:
             col_def = col_def + " NOT NULL"
         if col.__class__ is StringCol:

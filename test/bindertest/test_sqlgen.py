@@ -27,7 +27,7 @@ class CreateTableTest(unittest.TestCase):
             """CREATE TABLE foo (
     foo_id INT AUTO_INCREMENT PRIMARY KEY,
     i1 INT NOT NULL,
-    s1 VARCHAR(10) NOT NULL COLLATE utf8_general_ci,
+    s1 VARCHAR(10) CHARACTER SET utf8 NOT NULL COLLATE utf8_general_ci,
     d1 DATE
 )""",
             sql
@@ -47,7 +47,7 @@ class CreateTableTest(unittest.TestCase):
         self.assertEquals(
             """CREATE TABLE bar (
     bi INT,
-    bs VARCHAR(10) NOT NULL,
+    bs VARCHAR(10) CHARACTER SET utf8 NOT NULL,
     bd DATE,
     bdt1 DATETIME,
     bb BOOL NOT NULL
@@ -68,7 +68,7 @@ class CreateTableTest(unittest.TestCase):
             """CREATE TABLE baz (
     baz_id INT AUTO_INCREMENT PRIMARY KEY,
     i3 INT NOT NULL,
-    s3 VARCHAR(5) NOT NULL UNIQUE
+    s3 VARCHAR(5) CHARACTER SET utf8 NOT NULL UNIQUE
 )""",
             sql
             )

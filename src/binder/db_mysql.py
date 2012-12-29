@@ -12,6 +12,12 @@ class MysqlConnection(Connection):
         isolation_level = kwargs.pop('isolation_level', REPEATABLE_READ)
         assert isolation_level in _VALID_ISOLATION_LEVELS, \
             ("Unknown isolation_level", isolation_level)
+        #
+        assert not 'charset' in kwargs
+        kwargs['charset'] = 'utf8'
+        assert not 'use_unicode' in kwargs
+        kwargs['use_unicode'] = True
+        #
         dbconn = MySQLdb.connect(*args, **kwargs)
         dberror = MySQLdb.Error
         Connection.__init__(
