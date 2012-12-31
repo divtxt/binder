@@ -26,6 +26,6 @@ def connect_mysql(read_only=None, isolation_level=None):
 
 
 # Test DB - modify as needed
-#connect = connect_sqlite3
-connect = connect_mysql
+connect = connect_sqlite3
+#connect = connect_mysql
 
