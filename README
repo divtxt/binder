@@ -19,8 +19,8 @@ To achieve this, Binder is designed as follows:
 Note that Binder is *NOT* an ORM and does not provide ORM style features such
 as parent child containment, lazy loading, etc.
 
-Currently, Binder supports the SQLite embedded database via Python's built-in
-sqlite3 module.
+Currently, Binder supports the SQLite (via Python's built-in sqlite3 module)
+and MySQL (via the MySQLdb python module)
 
 See manual.txt for full documentation.
 

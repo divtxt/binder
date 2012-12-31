@@ -14,7 +14,9 @@ To use the Binder API, import as follows:
 
 This will import the following names:
 
-- 'Connection' - the Binder database connection and query class
+- 'Sqlite3Connection' - the connection and query class for SQLite databases
+- 'MysqlConnection' - the connection and query class for MySQL databases
+- 'READ_COMMITTED', 'REPEATABLE_READ' - transaction isolation level specifiers 
 - 'Table' - used to define an SQL table
 - Column types e.g. 'UnicodeCol' - used to define an SQL column
 - 'AND', 'OR' - used to build SQL queries
@@ -23,7 +25,7 @@ This will import the following names:
 Using Binder involves one of the following actions:
 
 - define a schema using 'Table' and columns e.g. 'UnicodeCol'
-- connecting to a database using 'Connection'
+- connecting to a database using 'Sqlite3Connection' or 'MysqlConnection'
 - performing SQL queries using the connection object
 
 
@@ -38,7 +40,7 @@ autoincremented id column, n is an integer column, and s is a string column
 
 Here is how you connect to an SQLite3 database:
 
-    >>> sqlconn = Connection("test.db3")
+    >>> sqlconn = Sqlite3Connection("test.db3")
 
 Note that SQLite3 will create the database file if it does not exist.
 
@@ -72,7 +74,7 @@ inserted row.
 
 Finally, let us run a SELECT query on the database table:
 
-    >>> sqlconn = Connection("test.db3")
+    >>> sqlconn = Sqlite3Connection("test.db3")
     >>> foo_list = sqlconn.select(Foo)
     >>> for foo in foo_list:
     ...     print foo
@@ -84,14 +86,27 @@ Note that select() currently returns a list containing a dictionary
 for each row in the result.
 
 
-## 'Connection'
+## Connection objects
 
-'Connection' represents an SQLite3 database connection. The syntax to create
+'Sqlite3Connection' represents an SQLite3 database connection. The syntax to
+create a connection is:
+
+    sqlconn = Sqlite3Connection(dbfile, read_only=None)
+
+If 'read_only' is True, the connection will only allow read queries e.g.
+select.
+
+'MysqlConnection' represents an MySQL database connection. The syntax to create
 a connection is:
 
-    sqlconn = Connection(dbfile, read_only=None)
+    sqlconn = MysqlConnection(...)
 
-A Connection object has the following API methods:
+All parameters expect 'read_only' and 'isolation_level' are passed to MySQLdb.
+
+If 'isolation_level' is not specified, 'REPEATABLE_READ' is used.
+
+
+A connection object has the following API methods:
 
 - Connection & transaction management:
     - commit() - commit the current transaction
