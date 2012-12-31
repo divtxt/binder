@@ -2,6 +2,7 @@
 from binder import col
 from binder.col import *
 import datetime
+import sys
 import unittest
 
 
@@ -90,13 +91,30 @@ class AutoIdColTest(unittest.TestCase):
 
 class IntColTest(unittest.TestCase):
 
-    def test_default_parse_str_to_str(self):
+    def test_default(self):
         coln = IntCol('alpha')
         colnn = IntCol('beta', False)
         # default
         self.assertEquals(0, coln.default_value)
         self.assertEquals(None, colnn.default_value)
-        # parse_str
+
+    def test_check_value_type(self):
+        coln = IntCol('alpha')
+        colnn = IntCol('beta', False)
+        # correct type
+        coln.check_value(1)
+        colnn.check_value(1L)
+        # wrong type
+        try:
+            coln.check_value(1.0)
+        except TypeError, e:
+            self.assertEquals("IntCol 'alpha': int expected, got float", str(e))
+        else:
+            self.fail()
+
+    def test_parse_str(self):
+        coln = IntCol('alpha')
+        colnn = IntCol('beta', False)
         self.assertEquals(3, coln.parse_str('3'))
         self.assertEquals(4, colnn.parse_str('4'))
         try:
@@ -106,6 +124,13 @@ class IntColTest(unittest.TestCase):
         else:
             self.fail()
         self.assertEquals(None, colnn.parse_str(''))
+        # long
+        l = sys.maxint + 1
+        self.assertEquals(l, colnn.parse_str(str(l)))
+
+    def test_to_str(self):
+        coln = IntCol('alpha')
+        colnn = IntCol('beta', False)
         # to_str
         self.assertEquals('12', coln.to_str(12))
         self.assertEquals('12', colnn.to_str(12))

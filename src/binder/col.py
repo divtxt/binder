@@ -98,6 +98,10 @@ class IntCol(ColBase):
             return None
         return int(value)
 
+    def check_value(self, value):
+        if not type(value) is long:
+            ColBase.check_value(self, value)
+
 
 class BoolCol(ColBase):
     "Boolean column."
