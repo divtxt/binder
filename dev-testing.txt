@@ -1,0 +1,97 @@
+
+This document explains how Binder is tested during development.
+
+## Running tests
+
+Tests are run using the 'run-tests.py' test runner:
+
+    ~/w/binder$ python run-tests.py 
+
+    ... (test runs)
+
+    SUMMARY: bindertest -> 14 total / 0 error (/usr/bin/python)
+
+
+## Testing MySQL
+
+By default, the source is set up to run tests using SQLite.
+
+To test MySQL, use the following steps:
+
+1. Set up a test database
+
+2. Install Python MySQLdb
+
+3. Edit 'test/bindertest/testdbconfig.py' with db details e.g. MYSQL_TESTDB
+
+4. Edit 'test/bindertest/testdbconfig.py' to use the correct db i.e. comment
+and uncomment the following set of lines as appropriate:
+
+    # Test DB - modify as needed
+    connect = connect_sqlite3
+    #connect = connect_mysql
+
+5. Run the tests using 'run-tests.py'
+
+
+## Example Linux + MySQL setup
+
+These are the setup steps I used for MySQL development and testing:
+
+- Create a new VM in VirtualBox
+    - Example settings: 512 MB of RAM, 4 GB Hard Disk
+
+- Install Ubuntu 12.04 Server
+    - Admin account: div
+    - Timezone: UTC
+    - Install SSH server
+
+- Configure Static IP
+    - Run command:
+        sudo vi /etc/network/interfaces
+    - Edit eth0 so that it has a static IP address, e.g.:
+        # The primary network interface
+        auto eth0
+        #iface eth0 inet dhcp
+        iface eth0 inet static
+                address 192.168.1.120
+                netmask 255.255.255.0
+                broadcast 192.168.1.255
+                gateway 192.168.1.1
+                dns-nameservers 192.168.1.1
+    - Restart networking:
+        sudo /etc/init.d/networking restart
+
+- Upgrade
+    - Run commands:
+        sudo aptitude update
+        sudo aptitude safe-upgrade
+        sudo aptitude full-upgrade
+
+- Better prompt:
+    - Add to the end of .bashrc:
+        export PS1='\[\033[0;35m\]\u@\h\[\033[0;33m\] \w\[\033[00m\]$ '
+    - Logout and login again to test
+
+
+- Install MySQL:
+    - Run command:
+        sudo aptitude install mysql-server mysql-client libmysqlclient15-dev
+        
+    - During the installation of MySQL, you will be presented with the screen
+    to enter a password.
+
+- Install Python MySQLdb:
+    - Run command:
+        sudo aptitude install python-mysqldb
+
+- Create test setup for Binder:
+    - Run command:
+        mysql -u root -p
+    - Run SQL:
+        create user 'bindertest'@'localhost' identified by 'binderpassword';
+        create database bindertestdb;
+        grant usage on *.* to bindertest@localhost
+        grant all privileges on bindertestdb.* to bindertest@localhost;
+
+
