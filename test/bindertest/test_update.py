@@ -53,7 +53,7 @@ class ConnUpdateTest(unittest.TestCase):
         foo2 = Foo.new(foo_id=2, i1=101)
         conn.insert(Foo, foo1)
         conn.insert(Foo, foo2)
-        Foo2 = Table("foo", AutoIdCol("i1"), StringCol("s1", 10))
+        Foo2 = Table("foo", AutoIdCol("i1"), UnicodeCol("s1", 10))
         try:
             foo3 = Foo2.new(i1=101, s1="xyz")
             conn.update_by_id(Foo2, foo3)

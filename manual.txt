@@ -16,20 +16,20 @@ This will import the following names:
 
 - 'Connection' - the Binder database connection and query class
 - 'Table' - used to define an SQL table
-- Column types e.g. 'StringCol' - used to define an SQL column
+- Column types e.g. 'UnicodeCol' - used to define an SQL column
 - 'AND', 'OR' - used to build SQL queries
 
 
 Using Binder involves one of the following actions:
 
-- define a schema using 'Table' and columns e.g. 'StringCol'
+- define a schema using 'Table' and columns e.g. 'UnicodeCol'
 - connecting to a database using 'Connection'
 - performing SQL queries using the connection object
 
 
 Here is an example schema definition:
 
-    >>> Foo = Table("foo", AutoIdCol("foo_id"), IntCol("n"), StringCol("s",10))
+    >>> Foo = Table("foo", AutoIdCol("foo_id"), IntCol("n"), UnicodeCol("s",10))
 
 This defines a table named 'foo' which has 3 columns: foo_id is an
 autoincremented id column, n is an integer column, and s is a string column
@@ -138,7 +138,7 @@ The following column types are defined:
 - AutoIdCol(col_name) - automatic integer primary key (Python integer)
 - IntCol(col_name, not_null=True) - Python integer
 - BoolCol(col_name, not_null=True) - Python boolean
-- StringCol(col_name, length, unique=False) - unicode with given maximum length
+- UnicodeCol(col_name, length, unique=False) - unicode with given maximum length
 - DateCol(col_name) - Python datetime.date
 - DateTimeUTCCol(col_name) - Python datetime.datetime without timezone
     (tzinfo field not filled in - the 

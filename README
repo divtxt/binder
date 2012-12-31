@@ -31,7 +31,7 @@ Define the schema for a table:
 
     >>> from binder import *
     >>> Stocks = Table("trades",
-    ...     DateCol("date"), StringCol("trans", 4), StringCol("symbol", 4),
+    ...     DateCol("date"), UnicodeCol("trans", 4), UnicodeCol("symbol", 4),
     ...     IntCol("qty"), IntCol("price")
     ... )
 

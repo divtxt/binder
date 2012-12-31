@@ -39,7 +39,7 @@ class ConnSelectTest(unittest.TestCase):
         # where AutoIdCol
         foo_list = conn.select(Foo, Foo.q.foo_id == 1)
         self.assertEquals([foo1], foo_list)
-        # where StringCol
+        # where UnicodeCol
         foo_list = conn.select(Foo, Foo.q.s1 == 'beta')
         self.assertEquals([foo2], foo_list)
         # where DateCol / NULL
@@ -98,7 +98,7 @@ class ConnSelectTest(unittest.TestCase):
         # where __gt__ & AutoIdCol
         foo_list = conn.select(Foo, Foo.q.foo_id > 2)
         self.assertEquals([foo3], foo_list)
-        # where __ge__ & StringCol
+        # where __ge__ & UnicodeCol
         foo_list = conn.select(Foo, Foo.q.s1 >= 'beta')
         self.assertEquals([foo2], foo_list)
         # where __lt__ & IntCol
@@ -195,7 +195,7 @@ class ConnSelectTest(unittest.TestCase):
         self.assertEquals([foo2, foo3, foo1], foo_list)
         foo_list = list(conn.select(Foo, order_by=Foo.q.i1.DESC))
         self.assertEquals([foo1, foo3, foo2], foo_list)
-        # StringCol - ignore case
+        # UnicodeCol - ignore case
         foo_list = list(conn.select(Foo, order_by=Foo.q.s1.ASC))
         self.assertEquals([foo1, foo2, foo3], foo_list)
         foo_list = list(conn.select(Foo, order_by=Foo.q.s1.DESC))
@@ -211,7 +211,7 @@ class ConnSelectTest(unittest.TestCase):
         conn.insert(Foo, foo2)
         conn.insert(Foo, foo3)
         conn.insert(Foo, foo4)
-        # where StringCol / order by
+        # where UnicodeCol / order by
         foo_list = conn.select(Foo, Foo.q.s1 == 'alpha', Foo.q.foo_id.ASC)
         self.assertEquals([foo1, foo3, foo4], foo_list)
         # where AND / order by

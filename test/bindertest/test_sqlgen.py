@@ -173,7 +173,7 @@ class UpdateTest(unittest.TestCase):
             sql
             )
         self.assertEquals([4, 23, u"pqr", "2006-05-04", 32], values)
-        # IntCol AND StringCol
+        # IntCol AND UnicodeCol
         sql, values = sqlgen.update(
             Foo, foo, AND(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"), "%s"
             )
@@ -191,7 +191,7 @@ class UpdateTest(unittest.TestCase):
             sql
             )
         self.assertEquals([5, u"abc", "2006-03-21", "2005-11-22T00:43:12Z", 1, 12], values)
-        # IntCol OR StringCol
+        # IntCol OR UnicodeCol
         sql, values = sqlgen.update(
             Foo, foo, OR(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"), "%s"
             )
@@ -289,11 +289,11 @@ class DeleteTest(unittest.TestCase):
         sql, values = sqlgen.delete(Foo, Foo.q.foo_id == 2, "?")
         self.assertEquals("DELETE FROM foo WHERE foo_id=?", sql)
         self.assertEquals([2], values)
-        # StringCol
+        # UnicodeCol
         sql, values = sqlgen.delete(Foo, Foo.q.i1 == 32, "%s")
         self.assertEquals("DELETE FROM foo WHERE i1=%s", sql)
         self.assertEquals([32], values)
-        # IntCol AND StringCol
+        # IntCol AND UnicodeCol
         sql, values = sqlgen.delete(
             Foo, AND(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"), "?"
             )
@@ -305,7 +305,7 @@ class DeleteTest(unittest.TestCase):
             )
         self.assertEquals("DELETE FROM bar WHERE bi=%s AND bd is NULL", sql)
         self.assertEquals([12], values)
-        # IntCol OR StringCol
+        # IntCol OR UnicodeCol
         sql, values = sqlgen.delete(
             Foo, OR(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"), "?"
             )

@@ -10,7 +10,7 @@ _COL_TYPE_SQLITE3 = {
     AutoIdCol: "INTEGER PRIMARY KEY",
     IntCol: "INTEGER",
     BoolCol: "INTEGER",
-    StringCol: "TEXT",
+    UnicodeCol: "TEXT",
     DateCol: "TEXT",
     DateTimeUTCCol: "TEXT",
 }
@@ -19,7 +19,7 @@ _COL_TYPE_MYSQL = {
     AutoIdCol: "INT AUTO_INCREMENT PRIMARY KEY",
     IntCol: "INT",
     BoolCol: "BOOL",
-    StringCol: "VARCHAR",
+    UnicodeCol: "VARCHAR",
     DateCol: "DATE",
     DateTimeUTCCol: "DATETIME",
 }
@@ -37,12 +37,12 @@ def create_table(dialect, table):
     for col in table.cols:
         col_type = col_types[col.__class__]
         col_def = "%s %s" % (col.col_name, col_type)
-        if col.__class__ is StringCol and dialect != DIALECT_SQLITE3:
+        if col.__class__ is UnicodeCol and dialect != DIALECT_SQLITE3:
             col_def = "%s(%d)" % (col_def, col.length)
             col_def = col_def + " CHARACTER SET utf8"
         if col.not_null and not col.__class__ is AutoIdCol:
             col_def = col_def + " NOT NULL"
-        if col.__class__ is StringCol:
+        if col.__class__ is UnicodeCol:
             if col.unique:
                 col_def = col_def + " UNIQUE"
             if col.collate_nocase:
@@ -246,8 +246,8 @@ def _sqlcond_to_sql(where, paramstr):
             value = "%d-%02d-%%" % (sqlcond.other.year, sqlcond.other.month)
             values.append(value)
         elif sqlcond.op == "LIKE":
-            assert isinstance(sqlcond.col, StringCol), \
-                "LIKE condition can only be used for StringCol"
+            assert isinstance(sqlcond.col, UnicodeCol), \
+                "LIKE condition can only be used for UnicodeCol"
             assert sqlcond.other != None, \
                 "LIKE condition cannot use None"
             cond_sql = "%s LIKE " + paramstr

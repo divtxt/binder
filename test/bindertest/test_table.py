@@ -21,7 +21,7 @@ class TableTest(unittest.TestCase):
 
     def test_init_duplicate_col_name(self):
         try:
-            Table("xyz", AutoIdCol("id1"), IntCol("x"), StringCol("x", 20))
+            Table("xyz", AutoIdCol("id1"), IntCol("x"), UnicodeCol("x", 20))
         except AssertionError, e:
             self.assertEquals("Table 'xyz' has more than one column with name 'x'", str(e))
         else:
@@ -209,7 +209,7 @@ class TableTest(unittest.TestCase):
         try:
             Foo.check_values(foo)
         except TypeError, e:
-            self.assertEquals("StringCol 's1': unicode expected, got float", str(e))
+            self.assertEquals("UnicodeCol 's1': unicode expected, got float", str(e))
         else:
             self.fail()
         # unknown columns ignored
@@ -255,7 +255,7 @@ class TableTest(unittest.TestCase):
         try:
             Foo.q.s1 > 23
         except TypeError, e:
-            self.assertEquals("StringCol 's1': unicode expected, got int", str(e))
+            self.assertEquals("UnicodeCol 's1': unicode expected, got int", str(e))
         else:
             self.fail()
 

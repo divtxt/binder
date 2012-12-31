@@ -162,10 +162,10 @@ class BoolColTest(unittest.TestCase):
         self.assertEquals('', colnn.to_str(None))
 
 
-class StringColTest(unittest.TestCase):
+class UnicodeColTest(unittest.TestCase):
 
     def test_check_value(self):
-        col = StringCol('alpha', 10)
+        col = UnicodeCol('alpha', 10)
         col.check_value('')
         col.check_value(u'')
         col.check_value('123456789X')
@@ -173,13 +173,13 @@ class StringColTest(unittest.TestCase):
         try:
             col.check_value('123456789X1')
         except ValueError, e:
-            self.assertEquals("StringCol 'alpha': string too long", str(e))
+            self.assertEquals("UnicodeCol 'alpha': string too long", str(e))
         else:
             self.fail()
         try:
             col.check_value(u'123456789X1')
         except ValueError, e:
-            self.assertEquals("StringCol 'alpha': string too long", str(e))
+            self.assertEquals("UnicodeCol 'alpha': string too long", str(e))
         else:
             self.fail()
         try:
@@ -191,7 +191,7 @@ class StringColTest(unittest.TestCase):
 
     def test_non_ascii(self):
         # check_value allows non-ascii - will be caught by py_to_db()
-        col = StringCol('alpha', 10)
+        col = UnicodeCol('alpha', 10)
         col.check_value('f\x81nf')
 
 

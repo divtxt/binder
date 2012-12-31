@@ -6,7 +6,7 @@ __version__ = '0.5'
 from binder.col import AutoIdCol
 from binder.col import IntCol
 from binder.col import BoolCol
-from binder.col import StringCol
+from binder.col import UnicodeCol
 from binder.col import DateCol
 from binder.col import DateTimeUTCCol
 

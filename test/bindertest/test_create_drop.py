@@ -10,7 +10,7 @@ Foo = Table(
     "foo",
     AutoIdCol("foo_id"),
     IntCol("i1"),
-    StringCol("s1", 10),
+    UnicodeCol("s1", 10),
     DateCol("d1"),
 )
 

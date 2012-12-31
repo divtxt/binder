@@ -6,7 +6,7 @@ __all__ = [
     "AutoIdCol",
     "IntCol",
     "BoolCol",
-    "StringCol",
+    "UnicodeCol",
     "DateCol",
     "DateTimeUTCCol",
     ]
@@ -137,8 +137,8 @@ class BoolCol(ColBase):
 
 
 # TODO: what is default and round trip of null/blank?
-class StringCol(ColBase):
-    "String column."
+class UnicodeCol(ColBase):
+    "Unicode string column."
 
     def __init__(self, col_name, length, unique=False, collate_nocase=False):
         assert type(length) is int, "length must be int"

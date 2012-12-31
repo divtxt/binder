@@ -8,7 +8,7 @@ Foo = Table(
     "foo",
     AutoIdCol("foo_id"),
     IntCol("i1"),
-    StringCol("s1", 10, collate_nocase=True),
+    UnicodeCol("s1", 10, collate_nocase=True),
     DateCol("d1"),
 )
 
@@ -16,16 +16,16 @@ Foo = Table(
 Bar = Table(
     "bar",
     IntCol("bi", False),
-    StringCol("bs", 10),
+    UnicodeCol("bs", 10),
     DateCol("bd"),
     DateTimeUTCCol("bdt1"),
     BoolCol("bb", True),
 )
 
-# Table with unique StringCol
+# Table with unique UnicodeCol
 Baz = Table(
     "baz",
     AutoIdCol("baz_id"),
     IntCol("i3"),
-    StringCol("s3", 5, unique=True),
+    UnicodeCol("s3", 5, unique=True),
 )

@@ -24,7 +24,7 @@ S_GERMAN_U = unicode(S_GERMAN_UTF8, "utf-8")
 Foo = Table(
     "foo",
     AutoIdCol("foo_id"),
-    StringCol("s1", 40),
+    UnicodeCol("s1", 40),
 )
 
 
