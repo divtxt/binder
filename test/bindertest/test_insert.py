@@ -51,7 +51,7 @@ class ConnInsertTest(unittest.TestCase):
             self.assertIn(
                 e.args,
                 [
-                    "PRIMARY KEY must be unique",
+                    ("PRIMARY KEY must be unique",),
                     (1062, "Duplicate entry \'1\' for key \'PRIMARY\'"),
                     ]
                 )
@@ -71,7 +71,7 @@ class ConnInsertTest(unittest.TestCase):
             self.assertIn(
                 e.args,
                 [
-                    "column s3 is not unique",
+                    ("column s3 is not unique",),
                     (1062, "Duplicate entry \'gamma\' for key \'s3\'"),
                     ]
                 )
@@ -91,7 +91,7 @@ class ConnInsertTest(unittest.TestCase):
             self.assertIn(
                 e.args,
                 [
-                    "column s3 is not unique",
+                    ("column s3 is not unique",),
                     (1062, "Duplicate entry \'\' for key \'s3\'"),
                     ]
                 )

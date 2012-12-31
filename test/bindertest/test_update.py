@@ -114,7 +114,7 @@ class ConnUpdateTest(unittest.TestCase):
             self.assertIn(
                 e.args,
                 [
-                    "PRIMARY KEY must be unique",
+                    ("PRIMARY KEY must be unique",),
                     (1062, "Duplicate entry \'4\' for key \'PRIMARY\'"),
                     ]
                 )
