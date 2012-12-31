@@ -14,18 +14,18 @@ To use the Binder API, import as follows:
 
 This will import the following names:
 
-- 'Sqlite3Connection' - the connection and query class for SQLite databases
-- 'MysqlConnection' - the connection and query class for MySQL databases
-- 'READ_COMMITTED', 'REPEATABLE_READ' - transaction isolation level specifiers 
-- 'Table' - used to define an SQL table
-- Column types e.g. 'UnicodeCol' - used to define an SQL column
-- 'AND', 'OR' - used to build SQL queries
+- `Sqlite3Connection` - the connection and query class for SQLite databases
+- `MysqlConnection` - the connection and query class for MySQL databases
+- `READ_COMMITTED`, `REPEATABLE_READ` - transaction isolation level specifiers
+- `Table` - used to define an SQL table
+- Column types e.g. `UnicodeCol` - used to define an SQL column
+- `AND`, `OR` - used to build SQL queries
 
 
 Using Binder involves one of the following actions:
 
-- define a schema using 'Table' and columns e.g. 'UnicodeCol'
-- connecting to a database using 'Sqlite3Connection' or 'MysqlConnection'
+- define a schema using `Table` and columns e.g. `UnicodeCol`
+- connecting to a database using `Sqlite3Connection` or `MysqlConnection`
 - performing SQL queries using the connection object
 
 
@@ -33,8 +33,8 @@ Here is an example schema definition:
 
     >>> Foo = Table("foo", AutoIdCol("foo_id"), IntCol("n"), UnicodeCol("s",10))
 
-This defines a table named 'foo' which has 3 columns: foo_id is an
-autoincremented id column, n is an integer column, and s is a string column
+This defines a table named `foo` which has 3 columns: `foo_id` is an
+autoincremented id column, `n` is an integer column, and `s` is a string column
 (with a size limit of 10 characters).
 
 
@@ -45,16 +45,16 @@ Here is how you connect to an SQLite3 database:
 Note that SQLite3 will create the database file if it does not exist.
 
 
-Here is how you create the database table 'foo':
+Here is how you create the database table `foo`:
 
     >>> sqlconn.create_table(Foo)
 
-The create_table() call will generate and run the correct CREATE TABLE
-statement for the schema defined by Foo.  Note that it will throw an
-error if the table already exists.
+This call will generate and run the correct `CREATE TABLE` statement for the
+schema defined by `Foo`.  Note that it will throw an error if the table already
+exists.
 
 
-Let's INSERT 2 rows of data:
+Let's `INSERT` 2 rows of data:
 
     >>> foo1 = {"foo_id": None, "n": 10, "s": "Hello"}
     >>> foo2 = {"foo_id": None, "n": 20, "s": "World"}
@@ -66,13 +66,12 @@ Let's INSERT 2 rows of data:
     {'s': 'World', 'foo_id': 2, 'n': 20}
     >>> sqlconn.commit()
 
-Note that the python's None value is used with columns of type
-AutoIdCol to tell SqlDict to use the next database id for the row being
-inserted.  Note also that the insert() call modifies the original
-dictionary by replacing the None value with the actual id of the
-inserted row.
+Note that the Python's `None` value is used with columns of type `AutoIdCol` to
+tell SqlDict to use the next database id for the row being inserted.  Note also
+that the `insert()` call modifies the original dictionary by replacing the
+`None` value with the actual id of the inserted row.
 
-Finally, let us run a SELECT query on the database table:
+Finally, let us run a `SELECT` query on the database table:
 
     >>> sqlconn = Sqlite3Connection("test.db3")
     >>> foo_list = sqlconn.select(Foo)
@@ -82,64 +81,66 @@ Finally, let us run a SELECT query on the database table:
     {'s': 'Hello', 'foo_id': 1, 'n': 10}
     {'s': 'World', 'foo_id': 2, 'n': 20}
 
-Note that select() currently returns a list containing a dictionary
-for each row in the result.
+Note that `select()` returns a list of rows where each row is a dictionary.
 
 
-## Connection objects
+## Connection types
 
-'Sqlite3Connection' represents an SQLite3 database connection. The syntax to
+`Sqlite3Connection` represents an SQLite3 database connection. The syntax to
 create a connection is:
 
     sqlconn = Sqlite3Connection(dbfile, read_only=None)
 
-If 'read_only' is True, the connection will only allow read queries e.g.
+- If `read_only` is True, the connection will only allow read queries e.g.
 select.
 
-'MysqlConnection' represents an MySQL database connection. The syntax to create
+`MysqlConnection` represents an MySQL database connection. The syntax to create
 a connection is:
 
     sqlconn = MysqlConnection(...)
 
-All parameters expect 'read_only' and 'isolation_level' are passed to MySQLdb.
+- All parameters expect `read_only` and `isolation_level` are passed to
+MySQLdb.connect()
+- If `isolation_level` is not specified, `REPEATABLE_READ` is used.
 
-If 'isolation_level' is not specified, 'REPEATABLE_READ' is used.
 
+## Using a Connection
 
 A connection object has the following API methods:
 
 - Connection & transaction management:
-    - commit() - commit the current transaction
-    - rollback() - rollback the current transaction
-    - close() - close the database connection
+    - `commit()` - commit the current transaction
+    - `rollback()` - rollback the current transaction
+    - `close()` - close the database connection
 
 - Schema definition SQL queries:
-    - create_table(table)
-    - drop_table(table, if_exists=False)
-    - drop_table_if_exists(table)
+    - `create_table(table)`
+    - `drop_table(table, if_exists=False)`
+    - `drop_table_if_exists(table)`
 
 - Basic SQL queries:
-    - insert(table, row) - INSERT the given row
-    - select(table, where=None, order_by=None) - SELECT rows as specified, returns list
-    - update(table, row, where) - UPDATE using given row and WHERE clause
-    - delete(table, where) - DELETE using given WHERE clause
+    - `insert(table, row)` - `INSERT` the given row
+    - `select(table, where=None, order_by=None)` - `SELECT` rows as specified, returns list
+    - `update(table, row, where)` - `UPDATE` using given row and `WHERE` clause
+    - `delete(table, where)` - `DELETE` using given `WHERE` clause
 
-- Basic SQL queries using row id:
-    - update_by_id(table, row) - UPDATE given row by it's id (AutoIdCol)
-    - get(table, row_id) - SELECT row with given id (AutoIdCol)
-    - delete_by_id(table, row_id) - DELETE row with given id (AutoIdCol)
+- Special SQL queries for tables using `AutoIdCol`:
+    - `update_by_id(table, row)` - `UPDATE` given row by it's id
+    - `get(table, row_id)` - `SELECT` row with given id
+    - `delete_by_id(table, row_id)` - `DELETE` row with given id
 
 - Misc:
-    - xselect(table, where=None, order_by=None) - same as select() but returns an iterator
+    - `xselect(table, where=None, order_by=None)` - same as `select()` but
+    returns an iterator to avoid fetching all the rows immediately
 
 
-For more detailed examples, especially on how to construct WHERE clauses
-and ORDER BY clauses, please see the automated tests.
+For more detailed examples, especially on how to construct `WHERE` clauses
+and `ORDER BY` clauses, please see the automated tests.
 
 
-### 'Table'
+### `Table`
 
-'Table' lets you define a table schema. It's usage is:
+`Table` lets you define a table schema. It's usage is:
 
     t = Table( "<table_name">, <col1>, <col2>, ...)
 
@@ -150,17 +151,17 @@ Note that a Table cannot have more than one AutoIdCol column.
 
 The following column types are defined:
 
-- AutoIdCol(col_name) - automatic integer primary key (Python integer)
-- IntCol(col_name, not_null=True) - Python integer
-- BoolCol(col_name, not_null=True) - Python boolean
-- UnicodeCol(col_name, length, unique=False) - unicode with given maximum length
-- DateCol(col_name) - Python datetime.date
-- DateTimeUTCCol(col_name) - Python datetime.datetime without timezone
+- `AutoIdCol(col_name)` - automatic integer primary key (Python integer)
+- `IntCol(col_name, not_null=True)` - Python integer
+- `BoolCol(col_name, not_null=True)` - Python boolean
+- `UnicodeCol(col_name, length, unique=False)` - unicode with given maximum length
+- `DateCol(col_name)` - Python datetime.date
+- `DateTimeUTCCol(col_name)` - Python datetime.datetime without timezone
     (tzinfo field not filled in - the 
 
-Note that some column types let you control the SQL NOT NULL option. If you
-allow NULLs for a column (i.e. not_null=False), the Python None value is
-used as representing SQL NULL.
+Note that some column types let you control the SQL `NOT NULL` option. If you
+allow `NULL`s for a column (i.e. `not_null=False`), the Python `None` value is
+used as representing SQL `NULL`.
 
 
 ### AND and OR
