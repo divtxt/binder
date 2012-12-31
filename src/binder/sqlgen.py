@@ -3,10 +3,10 @@ from binder.col import *
 from binder.table import SqlCondition, SqlSort, AND, OR, QueryCol
 
 
-DIALECT_SQLITE3 = "sqlite3"
+DIALECT_SQLITE = "sqlite"
 DIALECT_MYSQL = "mysql"
 
-_COL_TYPE_SQLITE3 = {
+_COL_TYPE_SQLITE = {
     AutoIdCol: "INTEGER PRIMARY KEY",
     IntCol: "INTEGER",
     BoolCol: "INTEGER",
@@ -25,8 +25,8 @@ _COL_TYPE_MYSQL = {
 }
 
 def create_table(dialect, table):
-    if dialect == DIALECT_SQLITE3:
-        col_types = _COL_TYPE_SQLITE3
+    if dialect == DIALECT_SQLITE:
+        col_types = _COL_TYPE_SQLITE
         collate_nocase_name = "NOCASE"
     elif dialect == DIALECT_MYSQL:
         col_types = _COL_TYPE_MYSQL
@@ -37,7 +37,7 @@ def create_table(dialect, table):
     for col in table.cols:
         col_type = col_types[col.__class__]
         col_def = "%s %s" % (col.col_name, col_type)
-        if col.__class__ is UnicodeCol and dialect != DIALECT_SQLITE3:
+        if col.__class__ is UnicodeCol and dialect != DIALECT_SQLITE:
             col_def = "%s(%d)" % (col_def, col.length)
             col_def = col_def + " CHARACTER SET utf8"
         if col.not_null and not col.__class__ is AutoIdCol:
@@ -234,7 +234,7 @@ def _sqlcond_to_sql(where, dialect, paramstr):
                 "YEAR condition can only be used for DateCol"
             assert sqlcond.other != None, \
                 "YEAR condition cannot use None"
-            if dialect == DIALECT_SQLITE3:
+            if dialect == DIALECT_SQLITE:
                 cond_sql = "%s LIKE " + paramstr
                 value = "%d-%%" % sqlcond.other.year
             elif dialect == DIALECT_MYSQL:
@@ -248,7 +248,7 @@ def _sqlcond_to_sql(where, dialect, paramstr):
                 "YEAR_MONTH condition can only be used for DateCol"
             assert sqlcond.other != None, \
                 "YEAR_MONTH condition cannot use None"
-            if dialect == DIALECT_SQLITE3:
+            if dialect == DIALECT_SQLITE:
                 cond_sql = "%s LIKE " + paramstr
                 value = "%d-%02d-%%" % (sqlcond.other.year, sqlcond.other.month)
             elif dialect == DIALECT_MYSQL:

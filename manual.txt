@@ -14,7 +14,7 @@ To use the Binder API, import as follows:
 
 This will import the following names:
 
-- `Sqlite3Connection` - the connection and query class for SQLite databases
+- `SqliteConnection` - the connection and query class for SQLite databases
 - `MysqlConnection` - the connection and query class for MySQL databases
 - `READ_COMMITTED`, `REPEATABLE_READ` - transaction isolation level specifiers
 - `Table` - used to define an SQL table
@@ -25,7 +25,7 @@ This will import the following names:
 Using Binder involves one of the following actions:
 
 - define a schema using `Table` and columns e.g. `UnicodeCol`
-- connecting to a database using `Sqlite3Connection` or `MysqlConnection`
+- connecting to a database using `SqliteConnection` or `MysqlConnection`
 - performing SQL queries using the connection object
 
 
@@ -38,11 +38,11 @@ autoincremented id column, `n` is an integer column, and `s` is a string column
 (with a size limit of 10 characters).
 
 
-Here is how you connect to an SQLite3 database:
+Here is how you connect to an SQLite database:
 
-    >>> sqlconn = Sqlite3Connection("test.db3")
+    >>> sqlconn = SqliteConnection("test.db3")
 
-Note that SQLite3 will create the database file if it does not exist.
+Note that SQLite will create the database file if it does not exist.
 
 
 Here is how you create the database table `foo`:
@@ -73,7 +73,7 @@ that the `insert()` call modifies the original dictionary by replacing the
 
 Finally, let us run a `SELECT` query on the database table:
 
-    >>> sqlconn = Sqlite3Connection("test.db3")
+    >>> sqlconn = SqliteConnection("test.db3")
     >>> foo_list = sqlconn.select(Foo)
     >>> for foo in foo_list:
     ...     print foo
@@ -86,10 +86,10 @@ Note that `select()` returns a list of rows where each row is a dictionary.
 
 ## Connection types
 
-`Sqlite3Connection` represents an SQLite3 database connection. The syntax to
+`SqliteConnection` represents an SQLite database connection. The syntax to
 create a connection is:
 
-    sqlconn = Sqlite3Connection(dbfile, read_only=None)
+    sqlconn = SqliteConnection(dbfile, read_only=None)
 
 - If `read_only` is True, the connection will only allow read queries e.g.
 select.

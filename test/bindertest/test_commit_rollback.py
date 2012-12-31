@@ -3,7 +3,7 @@ import unittest
 
 from binder import *
 
-from bindertest.testdbconfig import connect, connect_sqlite3
+from bindertest.testdbconfig import connect, connect_sqlite
 
 
 Foo = Table(
@@ -26,7 +26,7 @@ class CommitRollbackTest(unittest.TestCase):
     def test_commit_read_committed(self):
         foo = Foo.new(foo_id=1, i1=10, s1="xyz")
         conn1 = connect()
-        if connect is connect_sqlite3:
+        if connect is connect_sqlite:
             conn2 = connect()
         else:
             conn2 = connect(isolation_level=READ_COMMITTED)
@@ -36,7 +36,7 @@ class CommitRollbackTest(unittest.TestCase):
         self.assertEquals([foo], conn2.select(Foo))
 
     def test_commit_repeatable_read(self):
-        if connect is connect_sqlite3:
+        if connect is connect_sqlite:
             return
         foo = Foo.new(foo_id=1, i1=10, s1="xyz")
         conn1 = connect()

@@ -28,7 +28,7 @@ To test MySQL, use the following steps:
 and uncomment the following set of lines as appropriate:
 
     # Test DB - modify as needed
-    connect = connect_sqlite3
+    connect = connect_sqlite
     #connect = connect_mysql
 
 5. Run the tests using 'run-tests.py'

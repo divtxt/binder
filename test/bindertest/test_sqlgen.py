@@ -12,7 +12,7 @@ from bindertest.tabledefs import Foo, Bar, Baz
 class CreateTableTest(unittest.TestCase):
 
     def test(self):
-        sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE3, Foo)
+        sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE, Foo)
         self.assertEquals(
             """CREATE TABLE foo (
     foo_id INTEGER PRIMARY KEY,
@@ -32,7 +32,7 @@ class CreateTableTest(unittest.TestCase):
 )""",
             sql
             )
-        sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE3, Bar)
+        sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE, Bar)
         self.assertEquals(
             """CREATE TABLE bar (
     bi INTEGER,
@@ -54,7 +54,7 @@ class CreateTableTest(unittest.TestCase):
 )""",
             sql
             )
-        sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE3, Baz)
+        sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE, Baz)
         self.assertEquals(
             """CREATE TABLE baz (
     baz_id INTEGER PRIMARY KEY,
@@ -154,7 +154,7 @@ class UpdateTest(unittest.TestCase):
             )
         # no where condition
         sql, values = sqlgen.update(
-            Foo, foo, None, sqlgen.DIALECT_SQLITE3, "?"
+            Foo, foo, None, sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "UPDATE foo SET foo_id=?,i1=?,s1=?,d1=?",
@@ -172,7 +172,7 @@ class UpdateTest(unittest.TestCase):
         self.assertEquals([4, 23, u"pqr", "2006-05-04", 2], values)
         # IntCol
         sql, values = sqlgen.update(
-            Foo, foo, Foo.q.i1 == 32, sqlgen.DIALECT_SQLITE3,"?"
+            Foo, foo, Foo.q.i1 == 32, sqlgen.DIALECT_SQLITE,"?"
             )
         self.assertEquals(
             "UPDATE foo SET foo_id=?,i1=?,s1=?,d1=? WHERE i1=?",
@@ -192,7 +192,7 @@ class UpdateTest(unittest.TestCase):
         # IntCol AND DateCol / NULL
         sql, values = sqlgen.update(
                 Bar, bar, AND(Bar.q.bi == 12, Bar.q.bd == None),
-                sqlgen.DIALECT_SQLITE3, "?"
+                sqlgen.DIALECT_SQLITE, "?"
                 )
         self.assertEquals(
             "UPDATE bar SET bi=?,bs=?,bd=?,bdt1=?,bb=? WHERE bi=? AND bd is NULL",
@@ -212,7 +212,7 @@ class UpdateTest(unittest.TestCase):
         # IntCol OR DateCol / NULL
         sql, values = sqlgen.update(
             Bar, bar, OR(Bar.q.bi == 12, Bar.q.bd == None),
-            sqlgen.DIALECT_SQLITE3, "?"
+            sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "UPDATE bar SET bi=?,bs=?,bd=?,bdt1=?,bb=? WHERE bi=? OR bd is NULL",
@@ -234,7 +234,7 @@ class UpdateTest(unittest.TestCase):
     def test_auto_id(self):
         foo = Foo.new(foo_id=None, i1=25, s1="xyz")
         try:
-            sqlgen.update(Foo, foo, Foo.q.i1 == 12, sqlgen.DIALECT_SQLITE3, "?")
+            sqlgen.update(Foo, foo, Foo.q.i1 == 12, sqlgen.DIALECT_SQLITE, "?")
         except AssertionError, e:
             self.assertEquals("update(): cannot use None for AutoIdCol", str(e))
         else:
@@ -245,7 +245,7 @@ class UpdateTest(unittest.TestCase):
         foo["foo_id"] = 6
         foo["i1"] = "xyz"
         try:
-            sqlgen.update(Foo, foo, Foo.q.i1 == 23, sqlgen.DIALECT_SQLITE3, "?")
+            sqlgen.update(Foo, foo, Foo.q.i1 == 23, sqlgen.DIALECT_SQLITE, "?")
         except TypeError, e:
             self.assertEquals("IntCol 'i1': int expected, got str", str(e))
         else:
@@ -299,7 +299,7 @@ class DeleteTest(unittest.TestCase):
     def test(self):
         # AutoIdCol
         sql, values = sqlgen.delete(
-            Foo, Foo.q.foo_id == 2, sqlgen.DIALECT_SQLITE3, "?"
+            Foo, Foo.q.foo_id == 2, sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals("DELETE FROM foo WHERE foo_id=?", sql)
         self.assertEquals([2], values)
@@ -326,7 +326,7 @@ class DeleteTest(unittest.TestCase):
         # IntCol OR UnicodeCol
         sql, values = sqlgen.delete(
             Foo, OR(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"),
-            sqlgen.DIALECT_SQLITE3, "?"
+            sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals("DELETE FROM foo WHERE i1=? OR s1=?", sql)
         self.assertEquals([12, "aeiou"], values)
@@ -334,7 +334,7 @@ class DeleteTest(unittest.TestCase):
     def test_bad_values(self):
         try:
             sqlgen.delete(
-                Foo, Foo.q.i1 == "xyz", sqlgen.DIALECT_SQLITE3, "?"
+                Foo, Foo.q.i1 == "xyz", sqlgen.DIALECT_SQLITE, "?"
                 )
         except TypeError, e:
             self.assertEquals("IntCol 'i1': int expected, got str", str(e))
@@ -379,7 +379,7 @@ class SelectTest(unittest.TestCase):
 
     def test(self):
         sql, values = sqlgen.select(
-            Foo, None, None, sqlgen.DIALECT_SQLITE3, "?"
+            Foo, None, None, sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo",
@@ -397,7 +397,7 @@ class SelectTest(unittest.TestCase):
             )
         self.assertEquals([1], values)
         sql, values = sqlgen.select(
-            Bar, Bar.q.bs == 'x', None, sqlgen.DIALECT_SQLITE3, "?"
+            Bar, Bar.q.bs == 'x', None, sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "SELECT bi,bs,bd,bdt1,bb FROM bar WHERE bs=?",
@@ -418,7 +418,7 @@ class SelectTest(unittest.TestCase):
             Foo,
             AND(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'),
             None,
-            sqlgen.DIALECT_SQLITE3,
+            sqlgen.DIALECT_SQLITE,
             "?"
             )
         self.assertEquals(
@@ -430,7 +430,7 @@ class SelectTest(unittest.TestCase):
             Foo,
             OR(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'),
             None,
-            sqlgen.DIALECT_SQLITE3,
+            sqlgen.DIALECT_SQLITE,
             "?"
             )
         self.assertEquals(
@@ -458,7 +458,7 @@ class SelectTest(unittest.TestCase):
         self.assertEquals(['x'], values)
         sql, values = sqlgen.select(
             Foo, AND(Foo.q.i1 < 12, Foo.q.s1 <= 'y'), None,
-            sqlgen.DIALECT_SQLITE3, "?"
+            sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo WHERE i1<? AND s1<=?",
@@ -468,7 +468,7 @@ class SelectTest(unittest.TestCase):
         # None/NULL
         def check_no_None(cond, opstr):
             try:
-                sqlgen.select(Bar, cond, None, sqlgen.DIALECT_SQLITE3, "?")
+                sqlgen.select(Bar, cond, None, sqlgen.DIALECT_SQLITE, "?")
             except AssertionError, e:
                 self.assertEquals("Op '%s' does not support None" % opstr, str(e))
             else:
@@ -480,7 +480,7 @@ class SelectTest(unittest.TestCase):
         # BoolCol
         try:
             sqlgen.select(
-                Bar, Bar.q.bb > False, None, sqlgen.DIALECT_SQLITE3, "?"
+                Bar, Bar.q.bb > False, None, sqlgen.DIALECT_SQLITE, "?"
                 )
         except AssertionError, e:
             self.assertEquals("Op '>' does not support BoolCol", str(e))
@@ -492,7 +492,7 @@ class SelectTest(unittest.TestCase):
                 Bar,
                 Bar.q.bdt1 < datetime.datetime(2007, 5, 23, 0, 42, 12),
                 None,
-                sqlgen.DIALECT_SQLITE3,
+                sqlgen.DIALECT_SQLITE,
                 "?"
                 )
         except AssertionError, e:
@@ -506,7 +506,7 @@ class SelectTest(unittest.TestCase):
         # non DateCol
         try:
             sqlgen.select(
-                Foo, Foo.q.i1.YEAR(12), None, sqlgen.DIALECT_SQLITE3, "?"
+                Foo, Foo.q.i1.YEAR(12), None, sqlgen.DIALECT_SQLITE, "?"
                 )
         except AssertionError, e:
             self.assertEquals("YEAR condition can only be used for DateCol", str(e))
@@ -515,7 +515,7 @@ class SelectTest(unittest.TestCase):
         # YEAR / NULL
         try:
             sqlgen.select(
-                Foo, Foo.q.d1.YEAR(None), None, sqlgen.DIALECT_SQLITE3, "?"
+                Foo, Foo.q.d1.YEAR(None), None, sqlgen.DIALECT_SQLITE, "?"
                 )
         except AssertionError, e:
             self.assertEquals("YEAR condition cannot use None", str(e))
@@ -524,7 +524,7 @@ class SelectTest(unittest.TestCase):
         # YEAR
         sql, values = sqlgen.select(
             Foo, Foo.q.d1.YEAR(date(2006,3,14)), None,
-            sqlgen.DIALECT_SQLITE3, "?"
+            sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo WHERE d1 LIKE ?",
@@ -547,7 +547,7 @@ class SelectTest(unittest.TestCase):
         try:
             sqlgen.select(
                 Foo, Foo.q.i1.YEAR_MONTH(12), None,
-                sqlgen.DIALECT_SQLITE3, "?"
+                sqlgen.DIALECT_SQLITE, "?"
                 )
         except AssertionError, e:
             self.assertEquals("YEAR_MONTH condition can only be used for DateCol", str(e))
@@ -557,7 +557,7 @@ class SelectTest(unittest.TestCase):
         try:
             sqlgen.select(
                 Foo, Foo.q.d1.YEAR_MONTH(None), None,
-                sqlgen.DIALECT_SQLITE3, "?"
+                sqlgen.DIALECT_SQLITE, "?"
                 )
         except AssertionError, e:
             self.assertEquals("YEAR_MONTH condition cannot use None", str(e))
@@ -566,7 +566,7 @@ class SelectTest(unittest.TestCase):
         # YEAR_MONTH
         sql, values = sqlgen.select(
             Foo, Foo.q.d1.YEAR_MONTH(date(2005,7,12)), None,
-            sqlgen.DIALECT_SQLITE3, "?"
+            sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo WHERE d1 LIKE ?",
@@ -586,7 +586,7 @@ class SelectTest(unittest.TestCase):
     
     def x():
         sql, values = sqlgen.select(
-            Bar, Bar.q.bs == 'x', None, sqlgen.DIALECT_SQLITE3, "?"
+            Bar, Bar.q.bs == 'x', None, sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "SELECT bi,bs,bd FROM bar WHERE bs=?",
@@ -597,7 +597,7 @@ class SelectTest(unittest.TestCase):
             Foo,
             AND(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'),
             None,
-            sqlgen.DIALECT_SQLITE3,
+            sqlgen.DIALECT_SQLITE,
             "?"
             )
         self.assertEquals(
@@ -609,7 +609,7 @@ class SelectTest(unittest.TestCase):
     def test_order_by(self):
         # ASC
         sql, values = sqlgen.select(
-            Foo, None, Foo.q.foo_id.ASC, sqlgen.DIALECT_SQLITE3, "?"
+            Foo, None, Foo.q.foo_id.ASC, sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo ORDER BY foo_id ASC",
@@ -631,7 +631,7 @@ class SelectDistinctTest(unittest.TestCase):
 
     def test(self):
         sql, values = sqlgen.select_distinct(
-            Foo, Foo.q.i1, None, None, sqlgen.DIALECT_SQLITE3, "?"
+            Foo, Foo.q.i1, None, None, sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "SELECT DISTINCT i1 FROM foo",
@@ -641,7 +641,7 @@ class SelectDistinctTest(unittest.TestCase):
 
     def test_where(self):
         sql, values = sqlgen.select_distinct(
-            Foo, Foo.q.s1, Foo.q.foo_id == 1, None, sqlgen.DIALECT_SQLITE3, "?"
+            Foo, Foo.q.s1, Foo.q.foo_id == 1, None, sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "SELECT DISTINCT s1 FROM foo WHERE foo_id=?",
@@ -668,7 +668,7 @@ class SelectDistinctTest(unittest.TestCase):
             Foo.q.d1,
             OR(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'),
             None,
-            sqlgen.DIALECT_SQLITE3,
+            sqlgen.DIALECT_SQLITE,
             "?"
             )
         self.assertEquals(
@@ -680,7 +680,7 @@ class SelectDistinctTest(unittest.TestCase):
     def test_order_by(self):
         sql, values = sqlgen.select_distinct(
             Foo, Foo.q.foo_id, None, Foo.q.foo_id.ASC,
-            sqlgen.DIALECT_SQLITE3, "?"
+            sqlgen.DIALECT_SQLITE, "?"
             )
         self.assertEquals(
             "SELECT DISTINCT foo_id FROM foo ORDER BY foo_id ASC",
@@ -691,7 +691,7 @@ class SelectDistinctTest(unittest.TestCase):
         try:
             sqlgen.select_distinct(
                 Foo, Foo.q.i1, None, Foo.q.s1.ASC,
-                sqlgen.DIALECT_SQLITE3, "?"
+                sqlgen.DIALECT_SQLITE, "?"
                 )
         except AssertionError, e:
             self.assertEquals(

@@ -1,14 +1,14 @@
 
-from binder import Sqlite3Connection
+from binder import SqliteConnection
 from binder import MysqlConnection
 import os
 
 
-# sqlite3
+# SQLite
 _bindertest_dir = os.path.dirname( __file__ )
 DBFILE = os.path.join(_bindertest_dir, "test.db3")
-def connect_sqlite3(read_only=None):
-    return Sqlite3Connection(DBFILE, read_only)
+def connect_sqlite(read_only=None):
+    return SqliteConnection(DBFILE, read_only)
 
 # MySQL - modify as needed
 MYSQL_TESTDB = {
@@ -26,6 +26,6 @@ def connect_mysql(read_only=None, isolation_level=None):
 
 
 # Test DB - modify as needed
-connect = connect_sqlite3
+connect = connect_sqlite
 #connect = connect_mysql
 

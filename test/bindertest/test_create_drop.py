@@ -15,12 +15,12 @@ Foo = Table(
 )
 
 _NO_TABLE_FOO = [
-    ("no such table: foo",),            # sqlite3
+    ("no such table: foo",),            # sqlite
     (1051, "Unknown table \'foo\'"),    # MySQL
     ]
 
 _TABLE_FOO_EXISTS = [
-    ("table foo already exists",),          # sqlite3
+    ("table foo already exists",),          # sqlite
     (1050, "Table \'foo\' already exists"), # MySQL
     ]
 
