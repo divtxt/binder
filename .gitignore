@@ -4,6 +4,9 @@
 #
 test/bindertest/test.db3
 
+#
+build/
+
 # OS X noise
 .DS_Store
 
