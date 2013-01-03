@@ -30,7 +30,7 @@ See manual.txt for full documentation.
 Define the schema for a table:
 
     >>> from binder import *
-    >>> Stocks = Table("trades",
+    >>> Trades = Table("trades",
     ...     DateCol("date"), UnicodeCol("trans", 4), UnicodeCol("symbol", 4),
     ...     IntCol("qty"), IntCol("price")
     ... )
@@ -38,7 +38,7 @@ Define the schema for a table:
 Creating a new database using SQLite and create the table we defined above:
 
     >>> conn = Connection("readme.db3")
-    >>> conn.create_table(Stocks)
+    >>> conn.create_table(Trades)
 
 Insert a row using a regular Python dictionary:
 
@@ -47,12 +47,12 @@ Insert a row using a regular Python dictionary:
     ...     "date":date(2006, 1, 5), "trans":"BUY", "symbol":"RHAT",
     ...     "qty":100, "price":35
     ... }
-    >>> conn.insert(Stocks, row)
+    >>> conn.insert(Trades, row)
     >>> conn.commit()
 
 Finally, retrieve the data:
 
-    >>> conn.select(Stocks)
+    >>> conn.select(Trades)
     [{'date': datetime.date(2006, 1, 5), 'symbol': u'RHAT', 'trans': u'BUY', 'price'
     : 35, 'qty': 100}]
 
