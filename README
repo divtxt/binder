@@ -8,7 +8,6 @@ Install using setup.py:
     python setup.py install
 
 
-
 ## About
 
 Binder lets you define schemas and perform SQL operations using native Python
