@@ -3,6 +3,14 @@
 
 Binder is a lightweight mapping engine for SQL databases.
 
+Install using setup.py:
+
+    python setup.py install
+
+
+
+## About
+
 Binder lets you define schemas and perform SQL operations using native Python
 data types and methods.  Binder takes care of SQL query generation, parameter
 passing and data conversion.

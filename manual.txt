@@ -3,7 +3,7 @@
 
 Binder is a Python mapping API for SQL databases.
 
-See the file README as well for more details.
+See the file README for installation and more details.
 
 
 ## Overview
