@@ -157,7 +157,7 @@ The following column types are defined:
 - `UnicodeCol(col_name, length, unique=False)` - unicode with given maximum length
 - `DateCol(col_name)` - Python datetime.date
 - `DateTimeUTCCol(col_name)` - Python datetime.datetime without timezone
-    (tzinfo field not filled in - the 
+    (tzinfo field not filled in)
 
 Note that some column types let you control the SQL `NOT NULL` option. If you
 allow `NULL`s for a column (i.e. `not_null=False`), the Python `None` value is
