@@ -68,7 +68,7 @@ class ConnSelectTest(unittest.TestCase):
         foo_list = conn.select(Foo, OR(Foo.q.foo_id == 2, Foo.q.d1 == datetime.date(2007, 5, 11)))
         self.assertEquals([foo2], foo_list)
 
-    def test_where_YEAR_YEAR_MONTH(self):
+    def test_where_date_ops(self):
         conn = connect()
         foo1 = Foo.new(foo_id=1, d1=datetime.date(2005, 11, 24))
         foo2 = Foo.new(foo_id=2, d1=datetime.date(2006, 2, 16))
@@ -85,6 +85,16 @@ class ConnSelectTest(unittest.TestCase):
         foo_list = conn.select(Foo, Foo.q.d1.YEAR_MONTH(datetime.date(2005,11,1)))
         self.assertEquals([foo1], foo_list)
         foo_list = conn.select(Foo, Foo.q.d1.YEAR_MONTH(datetime.date(2006,5,2)))
+        self.assertEquals([foo3], foo_list)
+        # MONTH
+        foo_list = conn.select(Foo, Foo.q.d1.MONTH(datetime.date(2012,11,1)))
+        self.assertEquals([foo1], foo_list)
+        foo_list = conn.select(Foo, Foo.q.d1.MONTH(datetime.date(2012,2,24)))
+        self.assertEquals([foo2], foo_list)
+        # DAY
+        foo_list = conn.select(Foo, Foo.q.d1.DAY(datetime.date(2012,2,24)))
+        self.assertEquals([foo1], foo_list)
+        foo_list = conn.select(Foo, Foo.q.d1.DAY(datetime.date(2012,11,4)))
         self.assertEquals([foo3], foo_list)
 
     def test_where_gt_ge_lt_le(self):

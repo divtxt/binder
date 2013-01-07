@@ -258,6 +258,36 @@ def _sqlcond_to_sql(where, dialect, paramstr):
             else:
                 raise Exception, ("Unknown dialect", dialect)
             values.append(value)
+        elif sqlcond.op == "MONTH":
+            assert isinstance(sqlcond.col, DateCol), \
+                "MONTH condition can only be used for DateCol"
+            assert sqlcond.other != None, \
+                "MONTH condition cannot use None"
+            if dialect == DIALECT_SQLITE:
+                cond_sql = "%s LIKE " + paramstr
+                value = "%%-%02d-%%" % sqlcond.other.month
+            elif dialect == DIALECT_MYSQL:
+                # FIXME
+                cond_sql = "EXTRACT(MONTH FROM %s)=" + paramstr
+                value = "%02d" % sqlcond.other.month
+            else:
+                raise Exception, ("Unknown dialect", dialect)
+            values.append(value)
+        elif sqlcond.op == "DAY":
+            assert isinstance(sqlcond.col, DateCol), \
+                "DAY condition can only be used for DateCol"
+            assert sqlcond.other != None, \
+                "DAY condition cannot use None"
+            if dialect == DIALECT_SQLITE:
+                cond_sql = "%s LIKE " + paramstr
+                value = "%%-%02d" % sqlcond.other.day
+            elif dialect == DIALECT_MYSQL:
+                # FIXME
+                cond_sql = "EXTRACT(DAY FROM %s)=" + paramstr
+                value = "%02d" % sqlcond.other.day
+            else:
+                raise Exception, ("Unknown dialect", dialect)
+            values.append(value)
         elif sqlcond.op == "LIKE":
             assert isinstance(sqlcond.col, UnicodeCol), \
                 "LIKE condition can only be used for UnicodeCol"

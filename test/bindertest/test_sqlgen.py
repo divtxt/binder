@@ -583,7 +583,94 @@ class SelectTest(unittest.TestCase):
             sql
             )
         self.assertEquals(["200507"], values)
-    
+
+    def test_where_MONTH(self):
+        from datetime import date
+        # non DateCol
+        try:
+            sqlgen.select(
+                Foo, Foo.q.i1.MONTH(12), None,
+                sqlgen.DIALECT_SQLITE, "?"
+                )
+        except AssertionError, e:
+            self.assertEquals("MONTH condition can only be used for DateCol", str(e))
+        else:
+            self.fail()
+        # NULL
+        try:
+            sqlgen.select(
+                Foo, Foo.q.d1.MONTH(None), None,
+                sqlgen.DIALECT_SQLITE, "?"
+                )
+        except AssertionError, e:
+            self.assertEquals("MONTH condition cannot use None", str(e))
+        else:
+            self.fail()
+        # MONTH
+        sql, values = sqlgen.select(
+            Foo, Foo.q.d1.MONTH(date(2005,7,12)), None,
+            sqlgen.DIALECT_SQLITE, "?"
+            )
+        self.assertEquals(
+            "SELECT foo_id,i1,s1,d1 FROM foo WHERE d1 LIKE ?",
+            sql
+            )
+        self.assertEquals(["%-07-%"], values)
+        sql, values = sqlgen.select(
+            Foo, Foo.q.d1.MONTH(date(2005,7,12)), None,
+            sqlgen.DIALECT_MYSQL, "%s"
+            )
+        self.assertEquals(
+            "SELECT foo_id,i1,s1,d1 FROM foo" \
+                + " WHERE EXTRACT(MONTH FROM d1)=%s",
+            sql
+            )
+        self.assertEquals(["07"], values)
+
+    def test_where_DAY(self):
+        from datetime import date
+        # non DateCol
+        try:
+            sqlgen.select(
+                Foo, Foo.q.i1.DAY(12), None,
+                sqlgen.DIALECT_SQLITE, "?"
+                )
+        except AssertionError, e:
+            self.assertEquals("DAY condition can only be used for DateCol", str(e))
+        else:
+            self.fail()
+        # NULL
+        try:
+            sqlgen.select(
+                Foo, Foo.q.d1.DAY(None), None,
+                sqlgen.DIALECT_SQLITE, "?"
+                )
+        except AssertionError, e:
+            self.assertEquals("DAY condition cannot use None", str(e))
+        else:
+            self.fail()
+        # MONTH
+        sql, values = sqlgen.select(
+            Foo, Foo.q.d1.DAY(date(2005,7,2)), None,
+            sqlgen.DIALECT_SQLITE, "?"
+            )
+        self.assertEquals(
+            "SELECT foo_id,i1,s1,d1 FROM foo WHERE d1 LIKE ?",
+            sql
+            )
+        self.assertEquals(["%-02"], values)
+        sql, values = sqlgen.select(
+            Foo, Foo.q.d1.DAY(date(2005,7,2)), None,
+            sqlgen.DIALECT_MYSQL, "%s"
+            )
+        self.assertEquals(
+            "SELECT foo_id,i1,s1,d1 FROM foo" \
+                + " WHERE EXTRACT(DAY FROM d1)=%s",
+            sql
+            )
+        self.assertEquals(["02"], values)
+
+
     def x():
         sql, values = sqlgen.select(
             Bar, Bar.q.bs == 'x', None, sqlgen.DIALECT_SQLITE, "?"
