@@ -153,17 +153,20 @@ class Connection:
             )
 
 
-    def get(self, table, row_id):
+    def select_by_id(self, table, row_id):
         # construct where clause
         auto_id_col = table.auto_id_col
         assert auto_id_col, \
-                "get(): table '%s' does not have AutoIdCol" % table.table_name
-        assert not row_id is None, "get(): cannot use None for AutoIdCol"
+            "select_by_id(): table '%s' does not have AutoIdCol" % \
+                table.table_name
+        assert not row_id is None, \
+            "select_by_id(): cannot use None for AutoIdCol"
         q_auto_id_col = getattr(table.q, auto_id_col.col_name)
         where_id = (q_auto_id_col == row_id)
         # call select_one
         return self.select_one(table, where_id)
 
+    get = select_by_id
 
     def xselect(self, table, where=None, order_by=None):
         # gen sql

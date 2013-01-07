@@ -12,7 +12,7 @@ foo1 = Foo.new(foo_id=1, i1=101, s1="alpha")
 foo2 = Foo.new(foo_id=2, i1=101, s1="beta")
 
 
-class ConnGetTest(unittest.TestCase):
+class ConnSelectByIdTest(unittest.TestCase):
 
     def setUp(self):
         conn = connect()
@@ -25,17 +25,17 @@ class ConnGetTest(unittest.TestCase):
         conn.insert(Foo, foo2)
         conn.commit()
 
-    def test_get(self):
+    def test_select_by_id(self):
         conn = connect()
-        self.assertEquals(foo1, conn.get(Foo, 1))
+        self.assertEquals(foo1, conn.select_by_id(Foo, 1))
         self.assertEquals(foo2, conn.get(Foo, 2))
-        self.assertEquals(None, conn.get(Foo, 3))
+        self.assertEquals(None, conn.select_by_id(Foo, 3))
 
-    def test_get_more_than_one_row(self):
+    def test_select_by_id_more_than_one_row(self):
         conn = connect()
         Foo2 = Table("foo", AutoIdCol("i1"), IntCol("foo_id"))
         try:
-            conn.get(Foo2, 101)
+            conn.select_by_id(Foo2, 101)
         except AssertionError, e:
             msg, info = get_assert_tuple_args(e)
             self.assertEquals("select_one(): more than 1 row", msg)
@@ -52,7 +52,9 @@ class ConnGetTest(unittest.TestCase):
         try:
             conn.get(Bar, 12)
         except AssertionError, e:
-            self.assertEquals("get(): table 'bar' does not have AutoIdCol", str(e))
+            self.assertEquals(
+                "select_by_id(): table 'bar' does not have AutoIdCol", str(e)
+                )
         else:
             self.fail()
 
@@ -61,7 +63,9 @@ class ConnGetTest(unittest.TestCase):
         try:
             conn.get(Foo, None)
         except AssertionError, e:
-            self.assertEquals("get(): cannot use None for AutoIdCol", str(e))
+            self.assertEquals(
+                "select_by_id(): cannot use None for AutoIdCol", str(e)
+                )
         else:
             self.fail()
 
@@ -70,7 +74,9 @@ class ConnGetTest(unittest.TestCase):
         try:
             conn.get(Foo, '4')
         except TypeError, e:
-            self.assertEquals("AutoIdCol 'foo_id': int expected, got str", str(e))
+            self.assertEquals(
+                "AutoIdCol 'foo_id': int expected, got str", str(e)
+                )
         else:
             self.fail()
 
