@@ -252,7 +252,6 @@ def _sqlcond_to_sql(where, dialect, paramstr):
                 cond_sql = "%s LIKE " + paramstr
                 value = "%d-%02d-%%" % (sqlcond.other.year, sqlcond.other.month)
             elif dialect == DIALECT_MYSQL:
-                # FIXME
                 cond_sql = "EXTRACT(YEAR_MONTH FROM %s)=" + paramstr
                 value = "%d%02d" % (sqlcond.other.year, sqlcond.other.month)
             else:
@@ -267,9 +266,8 @@ def _sqlcond_to_sql(where, dialect, paramstr):
                 cond_sql = "%s LIKE " + paramstr
                 value = "%%-%02d-%%" % sqlcond.other.month
             elif dialect == DIALECT_MYSQL:
-                # FIXME
                 cond_sql = "EXTRACT(MONTH FROM %s)=" + paramstr
-                value = "%02d" % sqlcond.other.month
+                value = sqlcond.other.month
             else:
                 raise Exception, ("Unknown dialect", dialect)
             values.append(value)
@@ -282,9 +280,8 @@ def _sqlcond_to_sql(where, dialect, paramstr):
                 cond_sql = "%s LIKE " + paramstr
                 value = "%%-%02d" % sqlcond.other.day
             elif dialect == DIALECT_MYSQL:
-                # FIXME
                 cond_sql = "EXTRACT(DAY FROM %s)=" + paramstr
-                value = "%02d" % sqlcond.other.day
+                value = sqlcond.other.day
             else:
                 raise Exception, ("Unknown dialect", dialect)
             values.append(value)

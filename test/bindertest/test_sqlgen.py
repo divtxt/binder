@@ -625,7 +625,7 @@ class SelectTest(unittest.TestCase):
                 + " WHERE EXTRACT(MONTH FROM d1)=%s",
             sql
             )
-        self.assertEquals(["07"], values)
+        self.assertEquals([7], values)
 
     def test_where_DAY(self):
         from datetime import date
@@ -668,7 +668,7 @@ class SelectTest(unittest.TestCase):
                 + " WHERE EXTRACT(DAY FROM d1)=%s",
             sql
             )
-        self.assertEquals(["02"], values)
+        self.assertEquals([2], values)
 
 
     def x():
