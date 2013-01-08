@@ -1,7 +1,7 @@
 
 # Binder - User Manual
 
-Binder is a Python mapping API for SQL databases.
+Binder is a lightweight SQL mapper for Python.
 
 See the file README for installation and more details.
 

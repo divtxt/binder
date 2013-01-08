@@ -1,7 +1,7 @@
 
 # Binder - A Python SQL Mapper.
 
-Binder is a lightweight mapping engine for SQL databases.
+Binder is a lightweight SQL mapper for Python.
 
 Install using setup.py:
 
