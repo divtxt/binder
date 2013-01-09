@@ -198,6 +198,108 @@ def select_distinct(table, qcol, where, order_by, dialect, paramstr):
     return sql, values
 
 
+def _op_eq(sqlcond, dialect, paramstr):
+    if sqlcond.other == None:
+        return "%s is NULL", False, None
+    else:
+        cond_sql = "%s=" + paramstr
+        value = sqlcond.col.py_to_db(sqlcond.other)
+        return cond_sql, True, value
+
+def _op_gtgteltlte(sqlcond, dialect, paramstr):
+    assert not isinstance(sqlcond.col, BoolCol), \
+        "Op '%s' does not support BoolCol" % sqlcond.op
+    assert not isinstance(sqlcond.col, DateTimeUTCCol), \
+        "Op '%s' does not support DateTimeUTCCol" % sqlcond.op
+    assert not sqlcond.other is None, \
+        "Op '%s' does not support None" % sqlcond.op
+    cond_sql = "%s" + sqlcond.op + paramstr
+    value = sqlcond.col.py_to_db(sqlcond.other)
+    return cond_sql, True, value
+
+def _op_YEAR(sqlcond, dialect, paramstr):
+    assert isinstance(sqlcond.col, DateCol), \
+        "YEAR condition can only be used for DateCol"
+    assert sqlcond.other != None, \
+        "YEAR condition cannot use None"
+    if dialect == DIALECT_SQLITE:
+        cond_sql = "%s LIKE " + paramstr
+        value = "%d-%%" % sqlcond.other.year
+    elif dialect == DIALECT_MYSQL:
+        cond_sql = "YEAR(%s)=" + paramstr
+        value = sqlcond.other.year
+    else:
+        raise Exception, ("Unknown dialect", dialect)
+    return cond_sql, True, value
+
+def _op_YEAR_MONTH(sqlcond, dialect, paramstr):
+    assert isinstance(sqlcond.col, DateCol), \
+        "YEAR_MONTH condition can only be used for DateCol"
+    assert sqlcond.other != None, \
+        "YEAR_MONTH condition cannot use None"
+    if dialect == DIALECT_SQLITE:
+        cond_sql = "%s LIKE " + paramstr
+        value = "%d-%02d-%%" % (sqlcond.other.year, sqlcond.other.month)
+    elif dialect == DIALECT_MYSQL:
+        cond_sql = "EXTRACT(YEAR_MONTH FROM %s)=" + paramstr
+        value = "%d%02d" % (sqlcond.other.year, sqlcond.other.month)
+    else:
+        raise Exception, ("Unknown dialect", dialect)
+    return cond_sql, True, value
+
+def _op_MONTH(sqlcond, dialect, paramstr):
+    assert isinstance(sqlcond.col, DateCol), \
+        "MONTH condition can only be used for DateCol"
+    assert sqlcond.other != None, \
+        "MONTH condition cannot use None"
+    if dialect == DIALECT_SQLITE:
+        cond_sql = "%s LIKE " + paramstr
+        value = "%%-%02d-%%" % sqlcond.other.month
+    elif dialect == DIALECT_MYSQL:
+        cond_sql = "EXTRACT(MONTH FROM %s)=" + paramstr
+        value = sqlcond.other.month
+    else:
+        raise Exception, ("Unknown dialect", dialect)
+    return cond_sql, True, value
+
+def _op_DAY(sqlcond, dialect, paramstr):
+    assert isinstance(sqlcond.col, DateCol), \
+        "DAY condition can only be used for DateCol"
+    assert sqlcond.other != None, \
+        "DAY condition cannot use None"
+    if dialect == DIALECT_SQLITE:
+        cond_sql = "%s LIKE " + paramstr
+        value = "%%-%02d" % sqlcond.other.day
+    elif dialect == DIALECT_MYSQL:
+        cond_sql = "EXTRACT(DAY FROM %s)=" + paramstr
+        value = sqlcond.other.day
+    else:
+        raise Exception, ("Unknown dialect", dialect)
+    return cond_sql, True, value
+
+def _op_LIKE(sqlcond, dialect, paramstr):
+    assert isinstance(sqlcond.col, UnicodeCol), \
+        "LIKE condition can only be used for UnicodeCol"
+    assert sqlcond.other != None, \
+        "LIKE condition cannot use None"
+    cond_sql = "%s LIKE " + paramstr
+    value = sqlcond.other
+    return cond_sql, True, value
+
+_OP_MAP = {
+    "=": _op_eq,
+    ">": _op_gtgteltlte,
+    ">=": _op_gtgteltlte,
+    "<": _op_gtgteltlte,
+    "<=": _op_gtgteltlte,
+    "YEAR": _op_YEAR,
+    "YEAR_MONTH": _op_YEAR_MONTH,
+    "MONTH": _op_MONTH,
+    "DAY": _op_DAY,
+    "LIKE": _op_LIKE,
+    }
+
+
 def _sqlcond_to_sql(where, dialect, paramstr):
     if paramstr == "%s":
         paramstr = "%%s"
@@ -214,91 +316,14 @@ def _sqlcond_to_sql(where, dialect, paramstr):
     values = []
     cond_sqls = []
     for sqlcond in sqlconds:
-        if sqlcond.op == "=":
-            if sqlcond.other == None:
-                cond_sql = "%s is NULL"
-            else:
-                cond_sql = "%s=" + paramstr
-                value = sqlcond.col.py_to_db(sqlcond.other)
-                values.append(value)
-        elif sqlcond.op in [">", ">=", "<", "<="]:
-            assert not isinstance(sqlcond.col, BoolCol), \
-                "Op '%s' does not support BoolCol" % sqlcond.op
-            assert not isinstance(sqlcond.col, DateTimeUTCCol), \
-                "Op '%s' does not support DateTimeUTCCol" % sqlcond.op
-            assert not sqlcond.other is None, \
-                "Op '%s' does not support None" % sqlcond.op
-            cond_sql = "%s" + sqlcond.op + paramstr
-            value = sqlcond.col.py_to_db(sqlcond.other)
-            values.append(value)
-        elif sqlcond.op == "YEAR":
-            assert isinstance(sqlcond.col, DateCol), \
-                "YEAR condition can only be used for DateCol"
-            assert sqlcond.other != None, \
-                "YEAR condition cannot use None"
-            if dialect == DIALECT_SQLITE:
-                cond_sql = "%s LIKE " + paramstr
-                value = "%d-%%" % sqlcond.other.year
-            elif dialect == DIALECT_MYSQL:
-                cond_sql = "YEAR(%s)=" + paramstr
-                value = sqlcond.other.year
-            else:
-                raise Exception, ("Unknown dialect", dialect)
-            values.append(value)
-        elif sqlcond.op == "YEAR_MONTH":
-            assert isinstance(sqlcond.col, DateCol), \
-                "YEAR_MONTH condition can only be used for DateCol"
-            assert sqlcond.other != None, \
-                "YEAR_MONTH condition cannot use None"
-            if dialect == DIALECT_SQLITE:
-                cond_sql = "%s LIKE " + paramstr
-                value = "%d-%02d-%%" % (sqlcond.other.year, sqlcond.other.month)
-            elif dialect == DIALECT_MYSQL:
-                cond_sql = "EXTRACT(YEAR_MONTH FROM %s)=" + paramstr
-                value = "%d%02d" % (sqlcond.other.year, sqlcond.other.month)
-            else:
-                raise Exception, ("Unknown dialect", dialect)
-            values.append(value)
-        elif sqlcond.op == "MONTH":
-            assert isinstance(sqlcond.col, DateCol), \
-                "MONTH condition can only be used for DateCol"
-            assert sqlcond.other != None, \
-                "MONTH condition cannot use None"
-            if dialect == DIALECT_SQLITE:
-                cond_sql = "%s LIKE " + paramstr
-                value = "%%-%02d-%%" % sqlcond.other.month
-            elif dialect == DIALECT_MYSQL:
-                cond_sql = "EXTRACT(MONTH FROM %s)=" + paramstr
-                value = sqlcond.other.month
-            else:
-                raise Exception, ("Unknown dialect", dialect)
-            values.append(value)
-        elif sqlcond.op == "DAY":
-            assert isinstance(sqlcond.col, DateCol), \
-                "DAY condition can only be used for DateCol"
-            assert sqlcond.other != None, \
-                "DAY condition cannot use None"
-            if dialect == DIALECT_SQLITE:
-                cond_sql = "%s LIKE " + paramstr
-                value = "%%-%02d" % sqlcond.other.day
-            elif dialect == DIALECT_MYSQL:
-                cond_sql = "EXTRACT(DAY FROM %s)=" + paramstr
-                value = sqlcond.other.day
-            else:
-                raise Exception, ("Unknown dialect", dialect)
-            values.append(value)
-        elif sqlcond.op == "LIKE":
-            assert isinstance(sqlcond.col, UnicodeCol), \
-                "LIKE condition can only be used for UnicodeCol"
-            assert sqlcond.other != None, \
-                "LIKE condition cannot use None"
-            cond_sql = "%s LIKE " + paramstr
-            value = sqlcond.other
-            values.append(value)
-        else:
+        op_fn = _OP_MAP.get(sqlcond.op)
+        if not op_fn:
             raise AssertionError, "Unsupported op '%s'" % sqlcond.op
+        cond_sql, have_value, value = op_fn(sqlcond, dialect, paramstr)
         cond_sql = cond_sql % sqlcond.col.col_name
         cond_sqls.append(cond_sql)
+        if have_value:
+            values.append(value)
     sql = combiner.join(cond_sqls)
     return sql, values
 
