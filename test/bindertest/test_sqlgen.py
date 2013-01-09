@@ -29,7 +29,7 @@ class CreateTableTest(unittest.TestCase):
     i1 INT NOT NULL,
     s1 VARCHAR(10) CHARACTER SET utf8 NOT NULL COLLATE utf8_general_ci,
     d1 DATE
-)""",
+) ENGINE=INNODB""",
             sql
             )
         sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE, Bar)
@@ -51,7 +51,7 @@ class CreateTableTest(unittest.TestCase):
     bd DATE,
     bdt1 DATETIME,
     bb BOOL NOT NULL
-)""",
+) ENGINE=INNODB""",
             sql
             )
         sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE, Baz)
@@ -69,7 +69,7 @@ class CreateTableTest(unittest.TestCase):
     baz_id INT AUTO_INCREMENT PRIMARY KEY,
     i3 INT NOT NULL,
     s3 VARCHAR(5) CHARACTER SET utf8 NOT NULL UNIQUE
-)""",
+) ENGINE=INNODB""",
             sql
             )
 

@@ -51,6 +51,8 @@ def create_table(dialect, table):
     cols_sql = ",\n    ".join(col_defs)
     sql = "CREATE TABLE %s (\n    %s\n)" \
         % (table.table_name, cols_sql)
+    if dialect == DIALECT_MYSQL:
+        sql = sql + " ENGINE=INNODB"
     return sql
 
 
