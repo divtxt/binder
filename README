@@ -39,12 +39,12 @@ Define the schema for a table:
     >>> from binder import *
     >>> Trades = Table("trades",
     ...     DateCol("date"), UnicodeCol("trans", 4), UnicodeCol("symbol", 4),
-    ...     IntCol("qty"), IntCol("price")
+    ...     IntCol("qty"), FloatCol("price")
     ... )
 
 Creating a new database using SQLite and create the table we defined above:
 
-    >>> conn = Connection("readme.db3")
+    >>> conn = SqliteConnection("readme.db3")
     >>> conn.create_table(Trades)
 
 Insert a row using a regular Python dictionary:
@@ -61,6 +61,6 @@ Finally, retrieve the data:
 
     >>> conn.select(Trades)
     [{'date': datetime.date(2006, 1, 5), 'symbol': u'RHAT', 'trans': u'BUY', 'price'
-    : 35, 'qty': 100}]
+    : 35.0, 'qty': 100}]
 
 

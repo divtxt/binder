@@ -153,6 +153,7 @@ The following column types are defined:
 
 - `AutoIdCol(col_name)` - automatic integer primary key (Python integer)
 - `IntCol(col_name, not_null=True)` - Python integer
+- `FloatCol(col_name, not_null=True)` - Python float
 - `BoolCol(col_name, not_null=True)` - Python boolean
 - `UnicodeCol(col_name, length, unique=False)` - unicode with given maximum length
 - `DateCol(col_name)` - Python datetime.date
