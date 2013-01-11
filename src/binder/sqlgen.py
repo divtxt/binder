@@ -9,6 +9,7 @@ DIALECT_MYSQL = "mysql"
 _COL_TYPE_SQLITE = {
     AutoIdCol: "INTEGER PRIMARY KEY",
     IntCol: "INTEGER",
+    FloatCol: "REAL",
     BoolCol: "INTEGER",
     UnicodeCol: "TEXT",
     DateCol: "TEXT",
@@ -18,6 +19,7 @@ _COL_TYPE_SQLITE = {
 _COL_TYPE_MYSQL = {
     AutoIdCol: "INT AUTO_INCREMENT PRIMARY KEY",
     IntCol: "INT",
+    FloatCol: "DOUBLE PRECISION",
     BoolCol: "BOOL",
     UnicodeCol: "VARCHAR",
     DateCol: "DATE",

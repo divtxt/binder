@@ -123,15 +123,15 @@ class ConnUpdateTest(unittest.TestCase):
 
     def test_update_unique_clash(self):
         conn = connect()
-        baz1 = Baz.new(i3=101, s3="alpha")
-        baz2 = Baz.new(i3=23, s3="beta")
-        baz3 = Baz.new(i3=42, s3="gamma")
+        baz1 = Baz.new(f3=101, s3="alpha")
+        baz2 = Baz.new(f3=23, s3="beta")
+        baz3 = Baz.new(f3=42.42, s3="gamma")
         conn.insert(Baz, baz1)
         conn.insert(Baz, baz2)
         conn.insert(Baz, baz3)
         baz3["s3"] = "beta"
         try:
-            conn.update(Baz, baz3, Baz.q.i3 == 42)
+            conn.update(Baz, baz3, Baz.q.f3 == 42.42)
         except conn.DbError, e:
             self.assertIn(
                 e.args,

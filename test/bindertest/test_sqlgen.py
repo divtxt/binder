@@ -58,7 +58,7 @@ class CreateTableTest(unittest.TestCase):
         self.assertEquals(
             """CREATE TABLE baz (
     baz_id INTEGER PRIMARY KEY,
-    i3 INTEGER NOT NULL,
+    f3 REAL NOT NULL,
     s3 TEXT NOT NULL UNIQUE
 )""",
             sql
@@ -67,7 +67,7 @@ class CreateTableTest(unittest.TestCase):
         self.assertEquals(
             """CREATE TABLE baz (
     baz_id INT AUTO_INCREMENT PRIMARY KEY,
-    i3 INT NOT NULL,
+    f3 DOUBLE PRECISION NOT NULL,
     s3 VARCHAR(5) CHARACTER SET utf8 NOT NULL UNIQUE
 ) ENGINE=INNODB""",
             sql

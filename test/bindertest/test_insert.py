@@ -107,6 +107,16 @@ class ConnInsertTest(unittest.TestCase):
         foo2 = foo_list[0]
         Foo.check_values(foo2)
 
+    def test_roundtrip_precision(self):
+        import math
+        conn = connect()
+        conn.insert(Baz, Baz.new(f3=math.pi, s3="pi"))
+        conn.insert(Baz, Baz.new(f3=math.e, s3="e"))
+        pi = conn.select_one(Baz, Baz.q.s3 == 'pi')["f3"]
+        self.assertEquals(math.pi, pi)
+        e = conn.select_one(Baz, Baz.q.s3 == 'e')["f3"]
+        self.assertEquals(math.e, e)
+
     def test_RO(self):
         conn = connect("test123")
         try:

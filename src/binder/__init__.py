@@ -5,6 +5,7 @@ __version__ = '0.5'
 # Column definition
 from binder.col import AutoIdCol
 from binder.col import IntCol
+from binder.col import FloatCol
 from binder.col import BoolCol
 from binder.col import UnicodeCol
 from binder.col import DateCol

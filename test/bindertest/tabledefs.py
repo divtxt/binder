@@ -26,6 +26,6 @@ Bar = Table(
 Baz = Table(
     "baz",
     AutoIdCol("baz_id"),
-    IntCol("i3"),
+    FloatCol("f3"),
     UnicodeCol("s3", 5, unique=True),
 )

@@ -5,6 +5,7 @@ from datetime import date, datetime
 __all__ = [
     "AutoIdCol",
     "IntCol",
+    "FloatCol",
     "BoolCol",
     "UnicodeCol",
     "DateCol",
@@ -102,6 +103,29 @@ class IntCol(ColBase):
 
     def check_value(self, value):
         if not type(value) is long:
+            ColBase.check_value(self, value)
+
+
+class FloatCol(ColBase):
+    "Floating point column."
+
+    def __init__(self, col_name, not_null=True):
+        if not_null:
+            default_value = 0
+        else:
+            default_value = None
+        ColBase.__init__(self, col_name, not_null, float, default_value)
+
+    def parse_str(self, value):
+        if value == "":
+            if self.not_null:
+                raise ValueError, \
+                    "Column '%s' is NOT NULL, got blank string" % self.col_name
+            return None
+        return float(value)
+
+    def check_value(self, value):
+        if not type(value) is int:
             ColBase.check_value(self, value)
 
 
