@@ -34,7 +34,7 @@ Also note:
         - uncheck 'Line Feed' for 'Trailing'
 
 - In section: Pydev -> Interpreter - Python
-    - use 'Auto Config' 
+    - use 'Auto Config'
         - OR customize as preferred
 
 - In section: Pydev -> Editor -> Typing
@@ -73,5 +73,5 @@ While editing a python file, use the following Eclipse/PyDev features:
 
     - TIP: this should not be used in a few cases e.g. python files which
       modify sys.path before import
-    
+
 

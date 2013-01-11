@@ -5,7 +5,7 @@ This document explains how Binder is tested during development.
 
 Tests are run using the 'run-tests.py' test runner:
 
-    ~/w/binder$ python run-tests.py 
+    ~/w/binder$ python run-tests.py
 
     ... (test runs)
 
@@ -77,7 +77,7 @@ These are the setup steps I used for MySQL development and testing:
 - Install MySQL:
     - Run command:
         sudo aptitude install mysql-server mysql-client libmysqlclient15-dev
-        
+
     - During the installation of MySQL, you will be presented with the screen
     to enter a password.
 

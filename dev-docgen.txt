@@ -1,0 +1,38 @@
+
+Binder docs are written using Sphinx. ( http://sphinx-doc.org/index.html )
+
+This document explains how to the docs on Mac OS X.
+
+## Installing Sphinx in a virtualenv
+
+You can install Sphinx as root, but I prefer to use a virtualenv for Binder
+development.
+
+Create a virtualenv:
+
+    ~/w$ virtualenv venv-binder
+    New python executable in venv-binder/bin/python
+    Installing setuptools............done.
+    Installing pip...............done.
+    ~/w$ ./venv-binder/bin/
+    easy_install      pip               python
+    easy_install-2.7  pip-2.7           python2.7
+
+Activate the virtualenv & install Sphinx:
+
+    ~/w$ source ./venv-binder/bin/activate
+    (venv-binder)~/w$ pip install sphinx
+
+
+## Generating docs
+
+To generate the docs, activate the virtualenv:
+
+    ~/w$ source ./venv-binder/bin/activate
+
+and run `sphinx-build`:
+
+    (venv-binder)~/w$ cd binder
+    (venv-binder)~/w/binder$ sphinx-build doc doc-out
+
+
