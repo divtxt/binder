@@ -4,7 +4,7 @@ import unittest
 from binder import *
 import datetime
 
-from bindertest.testdbconfig import connect
+from bindertest.testdbconfig import connect, connect_mysql
 from bindertest.tabledefs import Foo, Baz
 
 
@@ -107,7 +107,11 @@ class ConnInsertTest(unittest.TestCase):
         foo2 = foo_list[0]
         Foo.check_values(foo2)
 
-    def test_roundtrip_precision(self):
+    def test_roundtrip_float_fidelity(self):
+        if connect == connect_mysql:
+            # MySQL for Python #292 Floats are not exactly preserved
+            # http://sourceforge.net/p/mysql-python/bugs/292/
+            return
         import math
         conn = connect()
         conn.insert(Baz, Baz.new(f3=math.pi, s3="pi"))
