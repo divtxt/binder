@@ -30,9 +30,9 @@ To generate the docs, activate the virtualenv:
 
     ~/w$ source ./venv-binder/bin/activate
 
-and run `sphinx-build`:
+and run `make html`:
 
-    (venv-binder)~/w$ cd binder
-    (venv-binder)~/w/binder$ sphinx-build doc doc-out
+    (venv-binder)~/w$ cd binder/doc
+    (venv-binder)~/w/binder/doc$ make html
 
 
