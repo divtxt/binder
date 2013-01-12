@@ -3,7 +3,11 @@
 
 Binder is a lightweight SQL mapper for Python.
 
-Install using setup.py:
+Install using pip:
+
+    pip install binder
+
+Install from source:
 
     python setup.py install
 
