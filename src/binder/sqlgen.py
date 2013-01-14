@@ -17,8 +17,8 @@ _COL_TYPE_SQLITE = {
 }
 
 _COL_TYPE_MYSQL = {
-    AutoIdCol: "INT AUTO_INCREMENT PRIMARY KEY",
-    IntCol: "INT",
+    AutoIdCol: "BIGINT AUTO_INCREMENT PRIMARY KEY",
+    IntCol: "BIGINT",
     FloatCol: "DOUBLE PRECISION",
     BoolCol: "BOOL",
     UnicodeCol: "VARCHAR",

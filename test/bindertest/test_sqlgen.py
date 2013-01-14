@@ -25,8 +25,8 @@ class CreateTableTest(unittest.TestCase):
         sql = sqlgen.create_table(sqlgen.DIALECT_MYSQL, Foo)
         self.assertEquals(
             """CREATE TABLE foo (
-    foo_id INT AUTO_INCREMENT PRIMARY KEY,
-    i1 INT NOT NULL,
+    foo_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    i1 BIGINT NOT NULL,
     s1 VARCHAR(10) CHARACTER SET utf8 NOT NULL COLLATE utf8_general_ci,
     d1 DATE
 ) ENGINE=INNODB""",
@@ -46,7 +46,7 @@ class CreateTableTest(unittest.TestCase):
         sql = sqlgen.create_table(sqlgen.DIALECT_MYSQL, Bar)
         self.assertEquals(
             """CREATE TABLE bar (
-    bi INT,
+    bi BIGINT,
     bs VARCHAR(10) CHARACTER SET utf8 NOT NULL,
     bd DATE,
     bdt1 DATETIME,
@@ -66,7 +66,7 @@ class CreateTableTest(unittest.TestCase):
         sql = sqlgen.create_table(sqlgen.DIALECT_MYSQL, Baz)
         self.assertEquals(
             """CREATE TABLE baz (
-    baz_id INT AUTO_INCREMENT PRIMARY KEY,
+    baz_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     f3 DOUBLE PRECISION NOT NULL,
     s3 VARCHAR(5) CHARACTER SET utf8 NOT NULL UNIQUE
 ) ENGINE=INNODB""",

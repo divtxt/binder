@@ -121,6 +121,14 @@ class ConnInsertTest(unittest.TestCase):
         e = conn.select_one(Baz, Baz.q.s3 == 'e')["f3"]
         self.assertEquals(math.e, e)
 
+    def test_intcol_roundtrip(self):
+        import sys
+        conn = connect()
+        foo = Foo.new(foo_id=1, i1=sys.maxint)
+        conn.insert(Foo, foo)
+        foo_list = conn.select(Foo)
+        self.assertEquals([foo], foo_list)
+
     def test_RO(self):
         conn = connect("test123")
         try:
