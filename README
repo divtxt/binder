@@ -1,7 +1,24 @@
 
 # Binder - A Python SQL Mapper.
 
-Binder is a lightweight SQL mapper for Python.
+Binder is a lightweight SQL mapper for Python that lets you perform SQL
+operations using native Python data types and methods:
+
+    >>> conn.select(Trades, AND(Trades.q.symbol=='RHAT', Trades.q.trans=='BUY'))
+    [{'date': datetime.date(2006, 1, 5), 'symbol': u'RHAT', 'trans': u'BUY', 'price'
+    : 35.0, 'qty': 100}]
+
+A database row is mapped to a Python dictionary containing native Python data
+types.  Binder gives you control of what SQL query is executed, while taking
+care of query generation, parameter passing and data conversion.
+
+Currently, Binder supports the SQLite (via Python's built-in sqlite3 module)
+and MySQL (via the MySQLdb python module).
+
+See manual.txt for full documentation.
+
+
+## Installing
 
 Install using pip:
 
@@ -10,30 +27,6 @@ Install using pip:
 Install from source:
 
     python setup.py install
-
-
-## About
-
-Binder lets you define schemas and perform SQL operations using native Python
-data types and methods.  Binder takes care of SQL query generation, parameter
-passing and data conversion.
-
-Binder is explicitly designed to be a transparent SQL mapping that gives you
-direct control of what database queries are executed.
-
-To achieve this, Binder is designed as follows:
-
-- one SQL row maps to one Python dictionary
-- one SQL column maps to one key in the Python dictionary
-- one SQL query maps to one python method in the API
-
-Note that Binder is *NOT* an ORM and does not provide ORM style features such
-as parent child containment, lazy loading, etc.
-
-Currently, Binder supports the SQLite (via Python's built-in sqlite3 module)
-and MySQL (via the MySQLdb python module)
-
-See manual.txt for full documentation.
 
 
 ## Quick Tour
