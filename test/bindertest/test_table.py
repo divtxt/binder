@@ -245,6 +245,14 @@ class TableTest(unittest.TestCase):
         qexpr = Foo.q.d1 <= date(2007, 5, 22)
         self.assert_(isinstance(qexpr, SqlCondition))
 
+    def test_q_ops_assign(self):
+        try:
+            Foo.q.foo_id = "xyz"
+        except AttributeError:
+            pass
+        else:
+            self.fail()
+
     def test_q_ops_check_value(self):
         try:
             Foo.q.foo_id == "xyz"

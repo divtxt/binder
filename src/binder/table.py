@@ -60,8 +60,11 @@ class QueryCols:
     def __init__(self, table_name, cols):
         for col in cols:
             qcol = QueryCol(col)
-            setattr(self, col.col_name, qcol)
+            self.__dict__[col.col_name] = qcol
 
+    def __setattr__(self, name, value):
+        raise AttributeError, \
+            "Setting ...q.'%s' = ... not allowed - did you mean to use ==?"
 
 class QueryCol:
 
