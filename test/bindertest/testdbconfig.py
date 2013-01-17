@@ -24,8 +24,13 @@ def connect_mysql(read_only=None, isolation_level=None):
         d['isolation_level'] = isolation_level
     return MysqlConnection(**d)
 
+# Postgres - modify as needed
+def connect_postgres(read_only=None, isolation_level=None):
+    raise NotImplementedError
+
 
 # Test DB - modify as needed
 connect = connect_sqlite
 #connect = connect_mysql
+#connect = connect_postgres
 
