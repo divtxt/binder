@@ -35,6 +35,38 @@ and uncomment the following set of lines as appropriate:
 5. Run the tests using 'run-tests.py'
 
 
+## PostgreSQL development setup on Mac OS X
+
+
+- Install Postgres.app
+    - Download from http://postgresapp.com/
+    - Unzip & move Postgres.app to ~/Applications
+    - Run Postgres.app
+
+- Create test setup for Binder:
+    - Create user and enter password 'binderpassword':
+        cd Applications/Postgres.app/Contents/MacOS/bin
+        ./createuser -S -R -D -P bindertest
+    - Create test db
+        ./createdb -O bindertest bindertestdb
+    - Test user
+        ./psql -d bindertestdb -U bindertest -W
+
+- Install psycopg2 in a virtualenv
+    - Download & unzip psycopg2:
+        ~/w$ gunzip psycopg2-2.4.6.tar.gz
+        ~/w$ tar xvf psycopg2-2.4.6.tar
+    - Create a virtualenv if needed or use the one as in dev-docgen.txt
+    - Activate the virtualenv:
+        ~/w$ source ./venv-binder/bin/activate
+    - Build & install psycopg2:
+        (venv-binder)~/w$ cd psycopg2-2.4.6
+        (venv-binder)~/w/psycopg2-2.4.6$ python setup.py install
+    - Test in Python:
+        import psycopg2
+        conn = psycopg2.connect(host="localhost", database="bindertestdb", user="bindertest", password="binderpassword")
+
+
 ## MySQL and PostgreSQL setup on Ubuntu Linux
 
 These are the setup steps I use for MySQL and PostgreSQL development and
