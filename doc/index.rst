@@ -13,7 +13,7 @@ types.  Binder gives you control of what SQL query is executed, while taking
 care of query generation, parameter passing and data conversion.
 
 Currently, Binder supports the SQLite (via Python's built-in sqlite3 module)
-and MySQL (via the MySQLdb python module).
+PostgreSQL (via psycopg2) and MySQL (via the MySQLdb python module).
 
 
 Contents
