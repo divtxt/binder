@@ -3,7 +3,7 @@ import unittest
 
 from binder import *
 
-from bindertest.testdbconfig import connect
+from bindertest.testdbconfig import connect, connect_postgres
 
 
 Foo = Table(
@@ -16,11 +16,13 @@ Foo = Table(
 
 _NO_TABLE_FOO = [
     ("no such table: foo",),            # sqlite
+    ('table "foo" does not exist\n',),  # Postgres
     (1051, "Unknown table \'foo\'"),    # MySQL
     ]
 
 _TABLE_FOO_EXISTS = [
     ("table foo already exists",),          # sqlite
+    ('table "foo" does not exist\n',),      # Postgres
     (1050, "Table \'foo\' already exists"), # MySQL
     ]
 
@@ -41,13 +43,24 @@ class CreateDropTest(unittest.TestCase):
             conn.create_table(Foo)
         except conn.DbError, e:
             self.assertIn(e.args, _TABLE_FOO_EXISTS)
-        conn = connect()
         conn.drop_table(Foo)
         conn = connect()
         try:
             conn.drop_table(Foo)
         except conn.DbError, e:
             self.assertIn(e.args, _NO_TABLE_FOO)
+
+    def test_create_transactional(self):
+        conn = connect()
+        conn.create_table(Foo)
+        conn = connect()
+        if connect == connect_postgres:
+            try:
+                conn.drop_table(Foo)
+            except conn.DbError, e:
+                self.assertIn(e.args, _NO_TABLE_FOO)
+        else:
+            conn.drop_table(Foo)
 
     def test_drop_if_exists(self):
         conn = connect()
