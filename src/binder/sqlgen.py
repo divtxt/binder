@@ -279,7 +279,7 @@ def _op_DAY(sqlcond, dialect, paramstr):
     if dialect == DIALECT_SQLITE:
         cond_sql = "%s LIKE " + paramstr
         value = "%%-%02d" % sqlcond.other.day
-    elif dialect == DIALECT_MYSQL:
+    elif dialect == DIALECT_POSTGRES or dialect == DIALECT_MYSQL:
         cond_sql = "EXTRACT(DAY FROM %s)=" + paramstr
         value = sqlcond.other.day
     else:
