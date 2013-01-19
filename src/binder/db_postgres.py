@@ -8,11 +8,13 @@ _psycopg2_imported = False
 _ISOLATION_LEVEL_MAP = {}
 
 def _import_psycopg2():
+    global _psycopg2_imported, psycopg2, _ISOLATION_LEVEL_MAP
+    #
     if _psycopg2_imported:
         return
     #
-    global psycopg2
     import psycopg2
+    _psycopg2_imported = True
     #
     from psycopg2 import extensions
     _ISOLATION_LEVEL_MAP.update({
@@ -32,11 +34,6 @@ class PostgresConnection(Connection):
         isolation_level = kwargs.pop('isolation_level', REPEATABLE_READ)
         assert isolation_level in _VALID_ISOLATION_LEVELS, \
             ("Unknown isolation_level", isolation_level)
-        #
-#        assert not 'charset' in kwargs
-#        kwargs['charset'] = 'utf8'
-#        assert not 'use_unicode' in kwargs
-#        kwargs['use_unicode'] = True
         #
         pg_isolation_level = _ISOLATION_LEVEL_MAP[isolation_level]
         #
