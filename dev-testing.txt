@@ -66,6 +66,8 @@ and uncomment the following set of lines as appropriate:
         import psycopg2
         conn = psycopg2.connect(host="localhost", database="bindertestdb", user="bindertest", password="binderpassword")
 
+- See dev-setup.txt for Eclipse/PyDev setup using the virtualenv
+
 
 ## MySQL and PostgreSQL setup on Ubuntu Linux
 

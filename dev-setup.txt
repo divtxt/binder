@@ -34,8 +34,12 @@ Also note:
         - uncheck 'Line Feed' for 'Trailing'
 
 - In section: Pydev -> Interpreter - Python
-    - use 'Auto Config'
-        - OR customize as preferred
+    - use 'Auto Config' to get the default Python interpreter
+    - OR to use a virtualenv python:
+        - click New...
+        - enter Name e.g. 'venv-binder'
+        - choose python executable e.g. '/Users/div/w/venv-binder/bin/python'
+        - remember to change the project's PyDev Interpreter setting
 
 - In section: Pydev -> Editor -> Typing
     - uncheck 'After '(' indent to its level ...'
