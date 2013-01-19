@@ -14,6 +14,7 @@ class ConnCloseTest(unittest.TestCase):
         conn = connect()
         conn.drop_table_if_exists(Foo)
         conn.create_table(Foo)
+        conn.commit()
 
     def test_close_insert(self):
         "Closing the connection prevents further operations on the connection."

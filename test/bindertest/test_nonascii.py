@@ -33,8 +33,8 @@ class ConnInsertTest(unittest.TestCase):
     def setUp(self):
         conn = connect()
         conn.drop_table_if_exists(Foo)
-        conn = connect()
         conn.create_table(Foo)
+        conn.commit()
 
     def test_insert_ascii(self):
         foo1 = Foo.new(foo_id=1, s1=S_ENGLISH_ASCII)

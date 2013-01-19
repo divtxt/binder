@@ -22,6 +22,7 @@ class CommitRollbackTest(unittest.TestCase):
         conn = connect()
         conn.drop_table_if_exists(Foo)
         conn.create_table(Foo)
+        conn.commit()
 
     def test_commit_read_committed(self):
         foo = Foo.new(foo_id=1, i1=10, s1="xyz")

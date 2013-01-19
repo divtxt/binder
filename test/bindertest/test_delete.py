@@ -15,9 +15,9 @@ class ConnDeleteTest(unittest.TestCase):
         conn = connect()
         conn.drop_table_if_exists(Foo)
         conn.drop_table_if_exists(Bar)
-        conn = connect()
         conn.create_table(Foo)
         conn.create_table(Bar)
+        conn.commit()
 
     def test_delete_by_id(self):
         conn = connect()

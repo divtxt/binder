@@ -13,8 +13,8 @@ class ConnSelectTest(unittest.TestCase):
     def setUp(self):
         conn = connect()
         conn.drop_table_if_exists(Foo)
-        conn = connect()
         conn.create_table(Foo)
+        conn.commit()
 
     def test_select(self):
         conn = connect()

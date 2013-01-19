@@ -16,10 +16,10 @@ class ConnUpdateTest(unittest.TestCase):
         conn.drop_table(Foo, True)
         conn.drop_table(Bar, True)
         conn.drop_table(Baz, True)
-        conn = connect()
         conn.create_table(Foo)
         conn.create_table(Bar)
         conn.create_table(Baz)
+        conn.commit()
 
     def test_update_by_id(self):
         conn = connect()
@@ -115,6 +115,7 @@ class ConnUpdateTest(unittest.TestCase):
                 e.args,
                 [
                     ("PRIMARY KEY must be unique",),
+                    ('duplicate key value violates unique constraint "foo_foo_id_key"\nDETAIL:  Key (foo_id)=(4) already exists.\n',),
                     (1062, "Duplicate entry \'4\' for key \'PRIMARY\'"),
                     ]
                 )
@@ -137,6 +138,7 @@ class ConnUpdateTest(unittest.TestCase):
                 e.args,
                 [
                     ("column s3 is not unique",),
+                    ('duplicate key value violates unique constraint "baz_s3_key"\nDETAIL:  Key (s3)=(beta) already exists.\n',),
                     (1062, "Duplicate entry \'beta\' for key \'s3\'"),
                     ]
                 )
