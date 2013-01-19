@@ -25,7 +25,7 @@ class CreateTableTest(unittest.TestCase):
         sql = sqlgen.create_table(sqlgen.DIALECT_POSTGRES, Foo)
         self.assertEquals(
             """CREATE TABLE foo (
-    foo_id SERIAL,
+    foo_id SERIAL UNIQUE,
     i1 BIGINT NOT NULL,
     s1 VARCHAR(10) NOT NULL COLLATE "C",
     d1 DATE
@@ -87,7 +87,7 @@ class CreateTableTest(unittest.TestCase):
         sql = sqlgen.create_table(sqlgen.DIALECT_POSTGRES, Baz)
         self.assertEquals(
             """CREATE TABLE baz (
-    baz_id SERIAL,
+    baz_id SERIAL UNIQUE,
     f3 DOUBLE PRECISION NOT NULL,
     s3 VARCHAR(5) NOT NULL UNIQUE
 )""",

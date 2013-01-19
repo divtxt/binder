@@ -52,6 +52,7 @@ class ConnInsertTest(unittest.TestCase):
                 e.args,
                 [
                     ("PRIMARY KEY must be unique",),
+                    ('duplicate key value violates unique constraint "foo_foo_id_key"\nDETAIL:  Key (foo_id)=(1) already exists.\n',),
                     (1062, "Duplicate entry \'1\' for key \'PRIMARY\'"),
                     ]
                 )

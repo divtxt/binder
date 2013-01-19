@@ -18,7 +18,7 @@ _COL_TYPE_SQLITE = {
 }
 
 _COL_TYPE_POSTGRES = {
-    AutoIdCol: "SERIAL",
+    AutoIdCol: "SERIAL UNIQUE",
     IntCol: "BIGINT",
     FloatCol: "DOUBLE PRECISION",
     BoolCol: "BOOLEAN",
