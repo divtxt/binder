@@ -81,11 +81,6 @@ class ConnSelectTest(unittest.TestCase):
         self.assertEquals([foo1], foo_list)
         foo_list = conn.select(Foo, Foo.q.d1.YEAR(datetime.date(2006,3,24)))
         self.assertEquals([foo2, foo3], foo_list)
-        # YEAR_MONTH
-        foo_list = conn.select(Foo, Foo.q.d1.YEAR_MONTH(datetime.date(2005,11,1)))
-        self.assertEquals([foo1], foo_list)
-        foo_list = conn.select(Foo, Foo.q.d1.YEAR_MONTH(datetime.date(2006,5,2)))
-        self.assertEquals([foo3], foo_list)
         # MONTH
         foo_list = conn.select(Foo, Foo.q.d1.MONTH(datetime.date(2012,11,1)))
         self.assertEquals([foo1], foo_list)

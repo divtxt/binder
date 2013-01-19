@@ -92,9 +92,6 @@ class QueryCol:
     def YEAR(self, date):
         return SqlCondition(self._col, "YEAR", date)
 
-    def YEAR_MONTH(self, date):
-        return SqlCondition(self._col, "YEAR_MONTH", date)
-
     def MONTH(self, date):
         return SqlCondition(self._col, "MONTH", date)
 

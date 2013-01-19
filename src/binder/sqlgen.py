@@ -256,21 +256,6 @@ def _op_YEAR(sqlcond, dialect, paramstr):
         raise Exception, ("Unknown dialect", dialect)
     return cond_sql, True, value
 
-def _op_YEAR_MONTH(sqlcond, dialect, paramstr):
-    assert isinstance(sqlcond.col, DateCol), \
-        "YEAR_MONTH condition can only be used for DateCol"
-    assert sqlcond.other != None, \
-        "YEAR_MONTH condition cannot use None"
-    if dialect == DIALECT_SQLITE:
-        cond_sql = "%s LIKE " + paramstr
-        value = "%d-%02d-%%" % (sqlcond.other.year, sqlcond.other.month)
-    elif dialect == DIALECT_POSTGRES or dialect == DIALECT_MYSQL:
-        cond_sql = "EXTRACT(YEAR_MONTH FROM %s)=" + paramstr
-        value = "%d%02d" % (sqlcond.other.year, sqlcond.other.month)
-    else:
-        raise Exception, ("Unknown dialect", dialect)
-    return cond_sql, True, value
-
 def _op_MONTH(sqlcond, dialect, paramstr):
     assert isinstance(sqlcond.col, DateCol), \
         "MONTH condition can only be used for DateCol"
@@ -317,7 +302,6 @@ _OP_MAP = {
     "<": _op_gtgteltlte,
     "<=": _op_gtgteltlte,
     "YEAR": _op_YEAR,
-    "YEAR_MONTH": _op_YEAR_MONTH,
     "MONTH": _op_MONTH,
     "DAY": _op_DAY,
     "LIKE": _op_LIKE,

@@ -576,49 +576,6 @@ class SelectTest(unittest.TestCase):
             sql
             )
         self.assertEquals([2006], values)
-    
-    def test_where_YEAR_MONTH(self):
-        from datetime import date
-        # non DateCol
-        try:
-            sqlgen.select(
-                Foo, Foo.q.i1.YEAR_MONTH(12), None,
-                sqlgen.DIALECT_SQLITE, "?"
-                )
-        except AssertionError, e:
-            self.assertEquals("YEAR_MONTH condition can only be used for DateCol", str(e))
-        else:
-            self.fail()
-        # NULL
-        try:
-            sqlgen.select(
-                Foo, Foo.q.d1.YEAR_MONTH(None), None,
-                sqlgen.DIALECT_SQLITE, "?"
-                )
-        except AssertionError, e:
-            self.assertEquals("YEAR_MONTH condition cannot use None", str(e))
-        else:
-            self.fail()
-        # YEAR_MONTH
-        sql, values = sqlgen.select(
-            Foo, Foo.q.d1.YEAR_MONTH(date(2005,7,12)), None,
-            sqlgen.DIALECT_SQLITE, "?"
-            )
-        self.assertEquals(
-            "SELECT foo_id,i1,s1,d1 FROM foo WHERE d1 LIKE ?",
-            sql
-            )
-        self.assertEquals(["2005-07-%"], values)
-        sql, values = sqlgen.select(
-            Foo, Foo.q.d1.YEAR_MONTH(date(2005,7,12)), None,
-            sqlgen.DIALECT_MYSQL, "%s"
-            )
-        self.assertEquals(
-            "SELECT foo_id,i1,s1,d1 FROM foo" \
-                + " WHERE EXTRACT(YEAR_MONTH FROM d1)=%s",
-            sql
-            )
-        self.assertEquals(["200507"], values)
 
     def test_where_MONTH(self):
         from datetime import date
