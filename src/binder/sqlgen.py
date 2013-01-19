@@ -246,6 +246,9 @@ def _op_YEAR(sqlcond, dialect, paramstr):
     if dialect == DIALECT_SQLITE:
         cond_sql = "%s LIKE " + paramstr
         value = "%d-%%" % sqlcond.other.year
+    elif dialect == DIALECT_POSTGRES:
+        cond_sql = "EXTRACT(YEAR FROM %s)=" + paramstr
+        value = sqlcond.other.year
     elif dialect == DIALECT_MYSQL:
         cond_sql = "YEAR(%s)=" + paramstr
         value = sqlcond.other.year
@@ -261,7 +264,7 @@ def _op_YEAR_MONTH(sqlcond, dialect, paramstr):
     if dialect == DIALECT_SQLITE:
         cond_sql = "%s LIKE " + paramstr
         value = "%d-%02d-%%" % (sqlcond.other.year, sqlcond.other.month)
-    elif dialect == DIALECT_MYSQL:
+    elif dialect == DIALECT_POSTGRES or dialect == DIALECT_MYSQL:
         cond_sql = "EXTRACT(YEAR_MONTH FROM %s)=" + paramstr
         value = "%d%02d" % (sqlcond.other.year, sqlcond.other.month)
     else:
@@ -276,7 +279,7 @@ def _op_MONTH(sqlcond, dialect, paramstr):
     if dialect == DIALECT_SQLITE:
         cond_sql = "%s LIKE " + paramstr
         value = "%%-%02d-%%" % sqlcond.other.month
-    elif dialect == DIALECT_MYSQL:
+    elif dialect == DIALECT_POSTGRES or dialect == DIALECT_MYSQL:
         cond_sql = "EXTRACT(MONTH FROM %s)=" + paramstr
         value = sqlcond.other.month
     else:
