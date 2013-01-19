@@ -22,7 +22,7 @@ _NO_TABLE_FOO = [
 
 _TABLE_FOO_EXISTS = [
     ("table foo already exists",),          # sqlite
-    ('table "foo" does not exist\n',),      # Postgres
+    ('relation "foo" already exist\n',),    # Postgres
     (1050, "Table \'foo\' already exists"), # MySQL
     ]
 
@@ -36,6 +36,7 @@ class CreateDropTest(unittest.TestCase):
             conn.drop_table(Foo)
         except conn.DbError, e:
             self.assertIn(e.args, _NO_TABLE_FOO)
+        conn.commit()
         conn = connect()
         conn.create_table(Foo)
         conn = connect()
