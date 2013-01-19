@@ -72,6 +72,7 @@ class ConnInsertTest(unittest.TestCase):
                 e.args,
                 [
                     ("column s3 is not unique",),
+                    ('duplicate key value violates unique constraint "baz_s3_key"\nDETAIL:  Key (s3)=(gamma) already exists.\n',),
                     (1062, "Duplicate entry \'gamma\' for key \'s3\'"),
                     ]
                 )
@@ -92,6 +93,7 @@ class ConnInsertTest(unittest.TestCase):
                 e.args,
                 [
                     ("column s3 is not unique",),
+                    ('duplicate key value violates unique constraint "baz_s3_key"\nDETAIL:  Key (s3)=() already exists.\n',),
                     (1062, "Duplicate entry \'\' for key \'s3\'"),
                     ]
                 )

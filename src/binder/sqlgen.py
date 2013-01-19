@@ -80,7 +80,7 @@ def drop_table(table, if_exists):
 
 
 
-def insert(table, row, paramstr):
+def insert(table, row, dialect, paramstr):
     values = []
     col_names = []
     value_qs = []
@@ -88,14 +88,16 @@ def insert(table, row, paramstr):
     auto_id_used = False
     for col in table.cols:
         col_name = col.col_name
-        col_names.append(col_name)
         value = row[col_name]
         col.check_value(value)
         if value is None:
-            value_qs.append('NULL')
             if col is auto_id_col:
                 auto_id_used = True
+            else:
+                col_names.append(col_name)
+                value_qs.append('NULL')
         else:
+            col_names.append(col_name)
             value_qs.append(paramstr)
             value = col.py_to_db(value)
             values.append(value)
@@ -103,6 +105,8 @@ def insert(table, row, paramstr):
     values_sql = ",".join(value_qs)
     sql = "INSERT INTO %s (%s) VALUES (%s)" \
         % (table.table_name, col_names_sql, values_sql)
+    if auto_id_used and dialect == DIALECT_POSTGRES:
+        sql = sql + " RETURNING " + auto_id_col.col_name
     return sql, values, auto_id_used
 
 

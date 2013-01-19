@@ -1,5 +1,6 @@
 
 from binder import sqlgen
+from binder.sqlgen import DIALECT_POSTGRES
 
 _debug = False
 
@@ -79,14 +80,20 @@ class Connection:
         # read only check
         self._check_write_ok()
         # gen sql
-        sql, values, auto_id_used = sqlgen.insert(table, row, self.paramstr)
+        sql, values, auto_id_used = \
+            sqlgen.insert(table, row, self.dialect, self.paramstr)
         # execute sql
         cursor = self._execute(sql, values)
         assert cursor.rowcount == 1, \
             "insert(): expected rowcount=1, got %s" % cursor.rowcount
         # replace AutoIdCol None with actual id
         if auto_id_used:
-            row[table.auto_id_col.col_name] = cursor.lastrowid
+            if self.dialect == DIALECT_POSTGRES:
+                new_id = cursor.fetchone()[0]
+            else:
+                new_id = cursor.lastrowid
+            row[table.auto_id_col.col_name] = new_id
+
 
 
     def update(self, table, row, where):
