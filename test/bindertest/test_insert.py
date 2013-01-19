@@ -14,9 +14,9 @@ class ConnInsertTest(unittest.TestCase):
         conn = connect()
         conn.drop_table_if_exists(Foo)
         conn.drop_table_if_exists(Baz)
-        conn = connect()
         conn.create_table(Foo)
         conn.create_table(Baz)
+        conn.commit()
 
     def test_manualid(self):
         conn = connect()
