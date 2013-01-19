@@ -139,12 +139,6 @@ class BoolCol(ColBase):
             default_value = None
         ColBase.__init__(self, col_name, not_null, bool, default_value)
 
-    def py_to_db(self, value):
-        return int(value)
-
-    def db_to_py(self, dbvalue):
-        return bool(dbvalue)
-
     def parse_str(self, value):
         if value == "":
             if self.not_null:
