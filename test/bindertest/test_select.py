@@ -4,7 +4,7 @@ import unittest
 from binder import *
 import datetime
 
-from bindertest.testdbconfig import connect, connect_mysql
+from bindertest.testdbconfig import connect, connect_postgres
 from bindertest.tabledefs import Foo
 
 
@@ -161,16 +161,25 @@ class ConnSelectTest(unittest.TestCase):
         conn.insert(Foo, foo3)
         # where trailing %
         foo_list = conn.select(Foo, Foo.q.s1.LIKE('ab%'))
-        self.assertEquals([foo1, foo2], foo_list)
+        if connect == connect_postgres:
+            self.assertEquals([foo1], foo_list)
+        else:
+            self.assertEquals([foo1, foo2], foo_list)
         # where trailing % - no matches
         foo_list = conn.select(Foo, Foo.q.s1.LIKE('%z%'))
         self.assertEquals([], foo_list)
         # where leading %
         foo_list = conn.select(Foo, Foo.q.s1.LIKE('%xy'))
-        self.assertEquals([foo2, foo3], foo_list)
+        if connect == connect_postgres:
+            self.assertEquals([foo3], foo_list)
+        else:
+            self.assertEquals([foo2, foo3], foo_list)
         # where both sides %
         foo_list = conn.select(Foo, Foo.q.s1.LIKE('%x%'))
-        self.assertEquals([foo2, foo3], foo_list)
+        if connect == connect_postgres:
+            self.assertEquals([foo3], foo_list)
+        else:
+            self.assertEquals([foo2, foo3], foo_list)
 
     def x():
         # where given date
