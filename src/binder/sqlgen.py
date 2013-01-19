@@ -4,6 +4,7 @@ from binder.table import SqlCondition, SqlSort, AND, OR, QueryCol
 
 
 DIALECT_SQLITE = "sqlite"
+DIALECT_POSTGRES = "postgres"
 DIALECT_MYSQL = "mysql"
 
 _COL_TYPE_SQLITE = {
@@ -14,6 +15,16 @@ _COL_TYPE_SQLITE = {
     UnicodeCol: "TEXT",
     DateCol: "TEXT",
     DateTimeUTCCol: "TEXT",
+}
+
+_COL_TYPE_POSTGRES = {
+    AutoIdCol: "SERIAL",
+    IntCol: "BIGINT",
+    FloatCol: "DOUBLE PRECISION",
+    BoolCol: "BOOLEAN",
+    UnicodeCol: "VARCHAR",
+    DateCol: "DATE",
+    DateTimeUTCCol: "TIMESTAMP",
 }
 
 _COL_TYPE_MYSQL = {
@@ -30,6 +41,9 @@ def create_table(dialect, table):
     if dialect == DIALECT_SQLITE:
         col_types = _COL_TYPE_SQLITE
         collate_nocase_name = "NOCASE"
+    elif dialect == DIALECT_POSTGRES:
+        col_types = _COL_TYPE_POSTGRES
+        collate_nocase_name = '"C"'
     elif dialect == DIALECT_MYSQL:
         col_types = _COL_TYPE_MYSQL
         collate_nocase_name = "utf8_general_ci"
@@ -41,7 +55,8 @@ def create_table(dialect, table):
         col_def = "%s %s" % (col.col_name, col_type)
         if col.__class__ is UnicodeCol and dialect != DIALECT_SQLITE:
             col_def = "%s(%d)" % (col_def, col.length)
-            col_def = col_def + " CHARACTER SET utf8"
+            if dialect == DIALECT_MYSQL:
+                col_def = col_def + " CHARACTER SET utf8"
         if col.not_null and not col.__class__ is AutoIdCol:
             col_def = col_def + " NOT NULL"
         if col.__class__ is UnicodeCol:

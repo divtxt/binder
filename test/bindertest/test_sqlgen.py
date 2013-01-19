@@ -22,6 +22,16 @@ class CreateTableTest(unittest.TestCase):
 )""",
             sql
             )
+        sql = sqlgen.create_table(sqlgen.DIALECT_POSTGRES, Foo)
+        self.assertEquals(
+            """CREATE TABLE foo (
+    foo_id SERIAL,
+    i1 BIGINT NOT NULL,
+    s1 VARCHAR(10) NOT NULL COLLATE "C",
+    d1 DATE
+)""",
+            sql
+            )
         sql = sqlgen.create_table(sqlgen.DIALECT_MYSQL, Foo)
         self.assertEquals(
             """CREATE TABLE foo (
@@ -43,6 +53,17 @@ class CreateTableTest(unittest.TestCase):
 )""",
             sql
             )
+        sql = sqlgen.create_table(sqlgen.DIALECT_POSTGRES, Bar)
+        self.assertEquals(
+            """CREATE TABLE bar (
+    bi BIGINT,
+    bs VARCHAR(10) NOT NULL,
+    bd DATE,
+    bdt1 TIMESTAMP,
+    bb BOOLEAN NOT NULL
+)""",
+            sql
+            )
         sql = sqlgen.create_table(sqlgen.DIALECT_MYSQL, Bar)
         self.assertEquals(
             """CREATE TABLE bar (
@@ -60,6 +81,15 @@ class CreateTableTest(unittest.TestCase):
     baz_id INTEGER PRIMARY KEY,
     f3 REAL NOT NULL,
     s3 TEXT NOT NULL UNIQUE
+)""",
+            sql
+            )
+        sql = sqlgen.create_table(sqlgen.DIALECT_POSTGRES, Baz)
+        self.assertEquals(
+            """CREATE TABLE baz (
+    baz_id SERIAL,
+    f3 DOUBLE PRECISION NOT NULL,
+    s3 VARCHAR(5) NOT NULL UNIQUE
 )""",
             sql
             )
