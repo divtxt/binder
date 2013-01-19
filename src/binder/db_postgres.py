@@ -17,6 +17,10 @@ def _import_psycopg2():
     _psycopg2_imported = True
     #
     from psycopg2 import extensions
+    #
+    psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+    psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
+    #
     _ISOLATION_LEVEL_MAP.update({
         #ISOLATION_LEVEL_AUTOCOMMIT
         #ISOLATION_LEVEL_READ_UNCOMMITTED
