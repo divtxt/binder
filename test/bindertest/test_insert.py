@@ -4,7 +4,7 @@ import unittest
 from binder import *
 import datetime
 
-from bindertest.testdbconfig import connect, connect_mysql
+from bindertest.testdbconfig import connect, connect_sqlite
 from bindertest.tabledefs import Foo, Baz
 
 
@@ -111,18 +111,19 @@ class ConnInsertTest(unittest.TestCase):
         Foo.check_values(foo2)
 
     def test_roundtrip_float_fidelity(self):
-        if connect == connect_mysql:
-            # MySQL for Python #292 Floats are not exactly preserved
-            # http://sourceforge.net/p/mysql-python/bugs/292/
-            return
+        before = 3.14159265358979323846264338327950288
+        if connect == connect_sqlite:
+            expected = before
+        else:
+            # XXX Postgres & Mysql roundtrip issues
+            # Postgres: http://psycopg.lighthouseapp.com/projects/62710/tickets/145
+            # MySQL: http://sourceforge.net/p/mysql-python/bugs/292/
+            expected = 3.14159265358979000737349451810587198
         import math
         conn = connect()
-        conn.insert(Baz, Baz.new(f3=math.pi, s3="pi"))
-        conn.insert(Baz, Baz.new(f3=math.e, s3="e"))
-        pi = conn.select_one(Baz, Baz.q.s3 == 'pi')["f3"]
-        self.assertEquals(math.pi, pi)
-        e = conn.select_one(Baz, Baz.q.s3 == 'e')["f3"]
-        self.assertEquals(math.e, e)
+        conn.insert(Baz, Baz.new(f3=before, s3="pi"))
+        after = conn.select_one(Baz, Baz.q.s3 == 'pi')["f3"]
+        self.assertEquals(expected, after)
 
     def test_intcol_roundtrip(self):
         import sys
