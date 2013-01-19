@@ -216,9 +216,15 @@ class ConnSelectTest(unittest.TestCase):
         self.assertEquals([foo1, foo3, foo2], foo_list)
         # UnicodeCol - ignore case
         foo_list = list(conn.select(Foo, order_by=Foo.q.s1.ASC))
-        self.assertEquals([foo1, foo2, foo3], foo_list)
+        if connect == connect_postgres:
+            self.assertEquals([foo2, foo1, foo3], foo_list)
+        else:
+            self.assertEquals([foo1, foo2, foo3], foo_list)
         foo_list = list(conn.select(Foo, order_by=Foo.q.s1.DESC))
-        self.assertEquals([foo3, foo2, foo1], foo_list)
+        if connect == connect_postgres:
+            self.assertEquals([foo3, foo1, foo2], foo_list)
+        else:
+            self.assertEquals([foo3, foo2, foo1], foo_list)
 
     def test_where_order_by(self):
         conn = connect()
