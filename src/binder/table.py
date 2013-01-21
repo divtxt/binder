@@ -101,6 +101,9 @@ class QueryCol:
     def LIKE(self, s):
         return SqlCondition(self._col, "LIKE", s)
 
+    def ILIKE(self, s):
+        return SqlCondition(self._col, "ILIKE", s)
+
 
 class SqlCondition:
 

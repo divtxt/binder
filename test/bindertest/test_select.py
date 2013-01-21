@@ -4,7 +4,7 @@ import unittest
 from binder import *
 import datetime
 
-from bindertest.testdbconfig import connect, connect_postgres
+from bindertest.testdbconfig import connect, connect_postgres, connect_sqlite
 from bindertest.tabledefs import Foo
 
 
@@ -146,7 +146,7 @@ class ConnSelectTest(unittest.TestCase):
         # FIXME: depending on db order
         self.assertEquals([foo1, foo2, foo3], foo_list)
 
-    def test_where_LIKE(self):
+    def test_where_LIKE_ILIKE(self):
         conn = connect()
         foo1 = Foo.new(foo_id=1, i1=101, s1="ab pq")
         foo2 = Foo.new(foo_id=2, i1=23, s1="AB PQ XY")
@@ -155,26 +155,29 @@ class ConnSelectTest(unittest.TestCase):
         conn.insert(Foo, foo2)
         conn.insert(Foo, foo3)
         # where trailing %
-        foo_list = conn.select(Foo, Foo.q.s1.LIKE('ab%'))
-        if connect == connect_postgres:
+        if connect != connect_sqlite:
+            foo_list = conn.select(Foo, Foo.q.s1.LIKE('ab%'))
             self.assertEquals([foo1], foo_list)
-        else:
-            self.assertEquals([foo1, foo2], foo_list)
+        foo_list = conn.select(Foo, Foo.q.s1.ILIKE('ab%'))
+        self.assertEquals([foo1, foo2], foo_list)
         # where trailing % - no matches
-        foo_list = conn.select(Foo, Foo.q.s1.LIKE('%z%'))
+        if connect != connect_sqlite:
+            foo_list = conn.select(Foo, Foo.q.s1.LIKE('%z%'))
+            self.assertEquals([], foo_list)
+        foo_list = conn.select(Foo, Foo.q.s1.ILIKE('%z%'))
         self.assertEquals([], foo_list)
         # where leading %
-        foo_list = conn.select(Foo, Foo.q.s1.LIKE('%xy'))
-        if connect == connect_postgres:
+        if connect != connect_sqlite:
+            foo_list = conn.select(Foo, Foo.q.s1.LIKE('%xy'))
             self.assertEquals([foo3], foo_list)
-        else:
-            self.assertEquals([foo2, foo3], foo_list)
+        foo_list = conn.select(Foo, Foo.q.s1.ILIKE('%xy'))
+        self.assertEquals([foo2, foo3], foo_list)
         # where both sides %
-        foo_list = conn.select(Foo, Foo.q.s1.LIKE('%x%'))
-        if connect == connect_postgres:
+        if connect != connect_sqlite:
+            foo_list = conn.select(Foo, Foo.q.s1.LIKE('%x%'))
             self.assertEquals([foo3], foo_list)
-        else:
-            self.assertEquals([foo2, foo3], foo_list)
+        foo_list = conn.select(Foo, Foo.q.s1.ILIKE('%x%'))
+        self.assertEquals([foo2, foo3], foo_list)
 
     def x():
         # where given date

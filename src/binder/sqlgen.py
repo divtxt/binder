@@ -291,9 +291,33 @@ def _op_LIKE(sqlcond, dialect, paramstr):
         "LIKE condition can only be used for UnicodeCol"
     assert sqlcond.other != None, \
         "LIKE condition cannot use None"
-    cond_sql = "%s LIKE " + paramstr
+    if dialect == DIALECT_SQLITE:
+        raise NotImplementedError
+    elif dialect == DIALECT_POSTGRES:
+        cond_sql = "%s LIKE " + paramstr
+    elif dialect == DIALECT_MYSQL:
+        cond_sql = "%s LIKE " + paramstr
+    else:
+        raise Exception, ("Unknown dialect", dialect)
     value = sqlcond.other
     return cond_sql, True, value
+
+def _op_ILIKE(sqlcond, dialect, paramstr):
+    assert isinstance(sqlcond.col, UnicodeCol), \
+        "LIKE condition can only be used for UnicodeCol"
+    assert sqlcond.other != None, \
+        "LIKE condition cannot use None"
+    if dialect == DIALECT_SQLITE:
+        cond_sql = "%s LIKE " + paramstr
+    elif dialect == DIALECT_POSTGRES:
+        cond_sql = "%s ILIKE " + paramstr
+    elif dialect == DIALECT_MYSQL:
+        cond_sql = "%s LIKE " + paramstr + " COLLATE utf8_general_ci"
+    else:
+        raise Exception, ("Unknown dialect", dialect)
+    value = sqlcond.other
+    return cond_sql, True, value
+
 
 _OP_MAP = {
     "=": _op_eq,
@@ -305,6 +329,7 @@ _OP_MAP = {
     "MONTH": _op_MONTH,
     "DAY": _op_DAY,
     "LIKE": _op_LIKE,
+    "ILIKE": _op_ILIKE,
     }
 
 
