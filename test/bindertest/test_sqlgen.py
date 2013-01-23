@@ -445,7 +445,7 @@ class SelectTest(unittest.TestCase):
             Bar, Bar.q.bs.LIKE('x%'), None, sqlgen.DIALECT_MYSQL, "%s"
             )
         self.assertEquals(
-            "SELECT bi,bs,bd,bdt1,bb FROM bar WHERE bs LIKE %s",
+            "SELECT bi,bs,bd,bdt1,bb FROM bar WHERE bs COLLATE utf8_bin LIKE %s",
             sql
             )
         self.assertEquals(['x%'], values)

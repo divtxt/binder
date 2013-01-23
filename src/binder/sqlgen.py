@@ -296,7 +296,7 @@ def _op_LIKE(sqlcond, dialect, paramstr):
     elif dialect == DIALECT_POSTGRES:
         cond_sql = "%s LIKE " + paramstr
     elif dialect == DIALECT_MYSQL:
-        cond_sql = "%s LIKE " + paramstr
+        cond_sql = "%s COLLATE utf8_bin LIKE " + paramstr
     else:
         raise Exception, ("Unknown dialect", dialect)
     value = sqlcond.other
