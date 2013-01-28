@@ -12,7 +12,7 @@ if sys.version_info >= (3, 0):
 setup(
     name='binder',
     description='Binder is a lightweight mapping engine for SQL databases.',
-    version='0.6',
+    version='0.7',
     url='https://github.com/divtxt',
     license='MIT',
     author='Div Shekhar',
