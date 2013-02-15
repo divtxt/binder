@@ -32,16 +32,6 @@ class CreateTableTest(unittest.TestCase):
 )""",
             sql
             )
-        sql = sqlgen.create_table(sqlgen.DIALECT_MYSQL, Foo)
-        self.assertEquals(
-            """CREATE TABLE foo (
-    foo_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    i1 BIGINT NOT NULL,
-    s1 VARCHAR(10) CHARACTER SET utf8 NOT NULL COLLATE utf8_general_ci,
-    d1 DATE
-) ENGINE=INNODB""",
-            sql
-            )
         sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE, Bar)
         self.assertEquals(
             """CREATE TABLE bar (
@@ -64,17 +54,6 @@ class CreateTableTest(unittest.TestCase):
 )""",
             sql
             )
-        sql = sqlgen.create_table(sqlgen.DIALECT_MYSQL, Bar)
-        self.assertEquals(
-            """CREATE TABLE bar (
-    bi BIGINT,
-    bs VARCHAR(10) CHARACTER SET utf8 NOT NULL,
-    bd DATE,
-    bdt1 DATETIME,
-    bb BOOL NOT NULL
-) ENGINE=INNODB""",
-            sql
-            )
         sql = sqlgen.create_table(sqlgen.DIALECT_SQLITE, Baz)
         self.assertEquals(
             """CREATE TABLE baz (
@@ -91,15 +70,6 @@ class CreateTableTest(unittest.TestCase):
     f3 DOUBLE PRECISION NOT NULL,
     s3 VARCHAR(5) NOT NULL UNIQUE
 )""",
-            sql
-            )
-        sql = sqlgen.create_table(sqlgen.DIALECT_MYSQL, Baz)
-        self.assertEquals(
-            """CREATE TABLE baz (
-    baz_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    f3 DOUBLE PRECISION NOT NULL,
-    s3 VARCHAR(5) CHARACTER SET utf8 NOT NULL UNIQUE
-) ENGINE=INNODB""",
             sql
             )
 
@@ -160,7 +130,7 @@ class InsertTest(unittest.TestCase):
 
     def test_auto_id_used(self):
         foo = Foo.new(foo_id=12, i1=101, s1="xyz", d1=None)
-        sql, values, auto_id_used = sqlgen.insert(Foo, foo, sqlgen.DIALECT_MYSQL, "%s")
+        sql, values, auto_id_used = sqlgen.insert(Foo, foo, sqlgen.DIALECT_POSTGRES, "%s")
         self.assertEquals(
             "INSERT INTO foo (foo_id,i1,s1,d1) VALUES (%s,%s,%s,NULL)",
             sql
@@ -199,7 +169,7 @@ class UpdateTest(unittest.TestCase):
         self.assertEquals([4, 23, u"pqr", "2006-05-04"], values)
         # AutoIdCol
         sql, values = sqlgen.update(
-            Foo, foo, Foo.q.foo_id == 2, sqlgen.DIALECT_MYSQL, "%s"
+            Foo, foo, Foo.q.foo_id == 2, sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
             "UPDATE foo SET foo_id=%s,i1=%s,s1=%s,d1=%s WHERE foo_id=%s",
@@ -218,7 +188,7 @@ class UpdateTest(unittest.TestCase):
         # IntCol AND UnicodeCol
         sql, values = sqlgen.update(
             Foo, foo, AND(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"),
-            sqlgen.DIALECT_MYSQL,"%s"
+            sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
             "UPDATE foo SET foo_id=%s,i1=%s,s1=%s,d1=%s WHERE i1=%s AND s1=%s",
@@ -238,7 +208,7 @@ class UpdateTest(unittest.TestCase):
         # IntCol OR UnicodeCol
         sql, values = sqlgen.update(
             Foo, foo, OR(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"),
-            sqlgen.DIALECT_MYSQL, "%s"
+            sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
             "UPDATE foo SET foo_id=%s,i1=%s,s1=%s,d1=%s WHERE i1=%s OR s1=%s",
@@ -259,7 +229,7 @@ class UpdateTest(unittest.TestCase):
     def test_null(self):
         foo = Foo.new(foo_id=4, i1=23, s1="pqr", d1=None)
         sql, values = sqlgen.update(
-            Foo, foo, Foo.q.i1 == 434, sqlgen.DIALECT_MYSQL, "%s"
+            Foo, foo, Foo.q.i1 == 434, sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
             "UPDATE foo SET foo_id=%s,i1=%s,s1=%s,d1=NULL WHERE i1=%s",
@@ -341,21 +311,21 @@ class DeleteTest(unittest.TestCase):
         self.assertEquals([2], values)
         # UnicodeCol
         sql, values = sqlgen.delete(
-            Foo, Foo.q.i1 == 32, sqlgen.DIALECT_MYSQL, "%s"
+            Foo, Foo.q.i1 == 32, sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals("DELETE FROM foo WHERE i1=%s", sql)
         self.assertEquals([32], values)
         # IntCol AND UnicodeCol
         sql, values = sqlgen.delete(
             Foo, AND(Foo.q.i1 == 12, Foo.q.s1 == "aeiou"),
-            sqlgen.DIALECT_MYSQL, "?"
+            sqlgen.DIALECT_POSTGRES, "?"
             )
         self.assertEquals("DELETE FROM foo WHERE i1=? AND s1=?", sql)
         self.assertEquals([12, "aeiou"], values)
         # IntCol AND DateCol / NULL
         sql, values = sqlgen.delete(
             Bar, AND(Bar.q.bi == 12, Bar.q.bd == None),
-            sqlgen.DIALECT_MYSQL, "%s"
+            sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals("DELETE FROM bar WHERE bi=%s AND bd is NULL", sql)
         self.assertEquals([12], values)
@@ -425,7 +395,7 @@ class SelectTest(unittest.TestCase):
 
     def test_where_eq(self):
         sql, values = sqlgen.select(
-            Foo, Foo.q.foo_id == 1, None, sqlgen.DIALECT_MYSQL, "%s"
+            Foo, Foo.q.foo_id == 1, None, sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo WHERE foo_id=%s",
@@ -442,10 +412,10 @@ class SelectTest(unittest.TestCase):
         self.assertEquals(['x'], values)
         #
         sql, values = sqlgen.select(
-            Bar, Bar.q.bs.LIKE('x%'), None, sqlgen.DIALECT_MYSQL, "%s"
+            Bar, Bar.q.bs.LIKE('x%'), None, sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
-            "SELECT bi,bs,bd,bdt1,bb FROM bar WHERE bs COLLATE utf8_bin LIKE %s",
+            "SELECT bi,bs,bd,bdt1,bb FROM bar WHERE bs LIKE %s",
             sql
             )
         self.assertEquals(['x%'], values)
@@ -477,7 +447,7 @@ class SelectTest(unittest.TestCase):
 
     def test_where_gt_ge_lt_le(self):
         sql, values = sqlgen.select(
-            Foo, Foo.q.foo_id > 1, None, sqlgen.DIALECT_MYSQL, "%s"
+            Foo, Foo.q.foo_id > 1, None, sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo WHERE foo_id>%s",
@@ -485,7 +455,7 @@ class SelectTest(unittest.TestCase):
             )
         self.assertEquals([1], values)
         sql, values = sqlgen.select(
-            Bar, Bar.q.bs >= 'x', None, sqlgen.DIALECT_MYSQL, "%s"
+            Bar, Bar.q.bs >= 'x', None, sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
             "SELECT bi,bs,bd,bdt1,bb FROM bar WHERE bs>=%s",
@@ -569,10 +539,10 @@ class SelectTest(unittest.TestCase):
         self.assertEquals(["2006-%"], values)
         sql, values = sqlgen.select(
             Foo, Foo.q.d1.YEAR(date(2006,3,14)), None,
-            sqlgen.DIALECT_MYSQL, "%s"
+            sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
-            "SELECT foo_id,i1,s1,d1 FROM foo WHERE YEAR(d1)=%s",
+            "SELECT foo_id,i1,s1,d1 FROM foo WHERE EXTRACT(YEAR FROM d1)=%s",
             sql
             )
         self.assertEquals([2006], values)
@@ -611,7 +581,7 @@ class SelectTest(unittest.TestCase):
         self.assertEquals(["%-07-%"], values)
         sql, values = sqlgen.select(
             Foo, Foo.q.d1.MONTH(date(2005,7,12)), None,
-            sqlgen.DIALECT_MYSQL, "%s"
+            sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo" \
@@ -654,7 +624,7 @@ class SelectTest(unittest.TestCase):
         self.assertEquals(["%-02"], values)
         sql, values = sqlgen.select(
             Foo, Foo.q.d1.DAY(date(2005,7,2)), None,
-            sqlgen.DIALECT_MYSQL, "%s"
+            sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo" \
@@ -698,7 +668,7 @@ class SelectTest(unittest.TestCase):
         self.assertEquals([], values)
         # DESC
         sql, values = sqlgen.select(
-            Foo, None, Foo.q.s1.DESC, sqlgen.DIALECT_MYSQL, "%s"
+            Foo, None, Foo.q.s1.DESC, sqlgen.DIALECT_POSTGRES, "%s"
             )
         self.assertEquals(
             "SELECT foo_id,i1,s1,d1 FROM foo ORDER BY s1 DESC",
@@ -734,7 +704,7 @@ class SelectDistinctTest(unittest.TestCase):
             Foo.q.d1,
             AND(Foo.q.i1 == 12, Foo.q.d1 == None, Foo.q.s1 == 'y'),
             None,
-            sqlgen.DIALECT_MYSQL,
+            sqlgen.DIALECT_POSTGRES,
             "%s"
             )
         self.assertEquals(

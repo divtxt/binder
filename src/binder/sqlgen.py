@@ -5,7 +5,6 @@ from binder.table import SqlCondition, SqlSort, AND, OR, QueryCol
 
 DIALECT_SQLITE = "sqlite"
 DIALECT_POSTGRES = "postgres"
-DIALECT_MYSQL = "mysql"
 
 _COL_TYPE_SQLITE = {
     AutoIdCol: "INTEGER PRIMARY KEY",
@@ -27,16 +26,6 @@ _COL_TYPE_POSTGRES = {
     DateTimeUTCCol: "TIMESTAMP",
 }
 
-_COL_TYPE_MYSQL = {
-    AutoIdCol: "BIGINT AUTO_INCREMENT PRIMARY KEY",
-    IntCol: "BIGINT",
-    FloatCol: "DOUBLE PRECISION",
-    BoolCol: "BOOL",
-    UnicodeCol: "VARCHAR",
-    DateCol: "DATE",
-    DateTimeUTCCol: "DATETIME",
-}
-
 def create_table(dialect, table):
     if dialect == DIALECT_SQLITE:
         col_types = _COL_TYPE_SQLITE
@@ -44,9 +33,6 @@ def create_table(dialect, table):
     elif dialect == DIALECT_POSTGRES:
         col_types = _COL_TYPE_POSTGRES
         collate_nocase_name = '"C"'
-    elif dialect == DIALECT_MYSQL:
-        col_types = _COL_TYPE_MYSQL
-        collate_nocase_name = "utf8_general_ci"
     else:
         assert False, "Unknown dialect: %s" % dialect
     col_defs = []
@@ -55,8 +41,6 @@ def create_table(dialect, table):
         col_def = "%s %s" % (col.col_name, col_type)
         if col.__class__ is UnicodeCol and dialect != DIALECT_SQLITE:
             col_def = "%s(%d)" % (col_def, col.length)
-            if dialect == DIALECT_MYSQL:
-                col_def = col_def + " CHARACTER SET utf8"
         if col.not_null and not col.__class__ is AutoIdCol:
             col_def = col_def + " NOT NULL"
         if col.__class__ is UnicodeCol:
@@ -68,8 +52,6 @@ def create_table(dialect, table):
     cols_sql = ",\n    ".join(col_defs)
     sql = "CREATE TABLE %s (\n    %s\n)" \
         % (table.table_name, cols_sql)
-    if dialect == DIALECT_MYSQL:
-        sql = sql + " ENGINE=INNODB"
     return sql
 
 
@@ -249,9 +231,6 @@ def _op_YEAR(sqlcond, dialect, paramstr):
     elif dialect == DIALECT_POSTGRES:
         cond_sql = "EXTRACT(YEAR FROM %s)=" + paramstr
         value = sqlcond.other.year
-    elif dialect == DIALECT_MYSQL:
-        cond_sql = "YEAR(%s)=" + paramstr
-        value = sqlcond.other.year
     else:
         raise Exception, ("Unknown dialect", dialect)
     return cond_sql, True, value
@@ -264,7 +243,7 @@ def _op_MONTH(sqlcond, dialect, paramstr):
     if dialect == DIALECT_SQLITE:
         cond_sql = "%s LIKE " + paramstr
         value = "%%-%02d-%%" % sqlcond.other.month
-    elif dialect == DIALECT_POSTGRES or dialect == DIALECT_MYSQL:
+    elif dialect == DIALECT_POSTGRES:
         cond_sql = "EXTRACT(MONTH FROM %s)=" + paramstr
         value = sqlcond.other.month
     else:
@@ -279,7 +258,7 @@ def _op_DAY(sqlcond, dialect, paramstr):
     if dialect == DIALECT_SQLITE:
         cond_sql = "%s LIKE " + paramstr
         value = "%%-%02d" % sqlcond.other.day
-    elif dialect == DIALECT_POSTGRES or dialect == DIALECT_MYSQL:
+    elif dialect == DIALECT_POSTGRES:
         cond_sql = "EXTRACT(DAY FROM %s)=" + paramstr
         value = sqlcond.other.day
     else:
@@ -295,8 +274,6 @@ def _op_LIKE(sqlcond, dialect, paramstr):
         raise NotImplementedError
     elif dialect == DIALECT_POSTGRES:
         cond_sql = "%s LIKE " + paramstr
-    elif dialect == DIALECT_MYSQL:
-        cond_sql = "%s COLLATE utf8_bin LIKE " + paramstr
     else:
         raise Exception, ("Unknown dialect", dialect)
     value = sqlcond.other
@@ -311,8 +288,6 @@ def _op_ILIKE(sqlcond, dialect, paramstr):
         cond_sql = "%s LIKE " + paramstr
     elif dialect == DIALECT_POSTGRES:
         cond_sql = "%s ILIKE " + paramstr
-    elif dialect == DIALECT_MYSQL:
-        cond_sql = "%s LIKE " + paramstr + " COLLATE utf8_general_ci"
     else:
         raise Exception, ("Unknown dialect", dialect)
     value = sqlcond.other

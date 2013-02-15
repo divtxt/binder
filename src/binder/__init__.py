@@ -21,7 +21,6 @@ from binder.table import OR
 # Connection object
 from binder.db_sqlite import SqliteConnection
 from binder.db_postgres import PostgresConnection
-from binder.db_mysql import MysqlConnection
 
 # Isolation levels
 from binder.conn import READ_COMMITTED

@@ -17,13 +17,11 @@ Foo = Table(
 _NO_TABLE_FOO = [
     ("no such table: foo",),            # sqlite
     ('table "foo" does not exist\n',),  # Postgres
-    (1051, "Unknown table \'foo\'"),    # MySQL
     ]
 
 _TABLE_FOO_EXISTS = [
     ("table foo already exists",),          # sqlite
     ('relation "foo" already exist\n',),    # Postgres
-    (1050, "Table \'foo\' already exists"), # MySQL
     ]
 
 

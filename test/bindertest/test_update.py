@@ -5,7 +5,7 @@ from assertutil import get_assert_tuple_args
 from binder import *
 import datetime
 
-from bindertest.testdbconfig import connect, connect_mysql
+from bindertest.testdbconfig import connect
 from bindertest.tabledefs import Foo, Bar, Baz
 
 
@@ -185,12 +185,7 @@ class ConnUpdateTest(unittest.TestCase):
         self.assertEquals([bar1, bar2, bar4a], bar_list)
         # ge
         rowcount = conn.update(Bar, bar4a, Bar.q.bi >= 2002)
-        if connect == connect_mysql:
-            # MySQL doesn't count matching rows where values don't change
-            # (bar3 already has same values being set by bar4a)
-            self.assertEquals(1, rowcount)
-        else:
-            self.assertEquals(2, rowcount)
+        self.assertEquals(2, rowcount)
         bar_list = conn.select(Bar, order_by=Bar.q.bi.ASC)
         self.assertEquals([bar1, bar4a, bar4a], bar_list)
         # lt

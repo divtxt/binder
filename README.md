@@ -14,8 +14,8 @@ A database row is mapped to a Python dictionary containing native Python data
 types.  Binder gives you control of what SQL query is executed, while taking
 care of query generation, parameter passing and data conversion.
 
-Currently, Binder supports the SQLite (via Python's built-in sqlite3 module),
-PostgreSQL (via psycopg2) and MySQL (via the MySQLdb python module).
+Currently, Binder supports SQLite (via Python's built-in sqlite3 module) and
+PostgreSQL (via psycopg2).
 
 See manual.txt for full documentation.
 

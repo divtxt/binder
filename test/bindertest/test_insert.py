@@ -115,9 +115,8 @@ class ConnInsertTest(unittest.TestCase):
         if connect == connect_sqlite:
             expected = before
         else:
-            # XXX Postgres & Mysql roundtrip issues
+            # XXX Postgres roundtrip issues
             # Postgres: http://psycopg.lighthouseapp.com/projects/62710/tickets/145
-            # MySQL: http://sourceforge.net/p/mysql-python/bugs/292/
             expected = 3.14159265358979000737349451810587198
         import math
         conn = connect()
