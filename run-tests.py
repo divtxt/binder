@@ -2,8 +2,6 @@
 import os, sys
 
 PROJECT_DIR = os.path.abspath(os.path.dirname( __file__ ))
-SRC_DIR = os.path.join(PROJECT_DIR, "src")
-TEST_DIR = os.path.join(PROJECT_DIR, "test")
 
 def runtestdir(subdir):
     entries = os.listdir(subdir)
@@ -25,7 +23,7 @@ def runtestdir(subdir):
 
 
 if __name__ == "__main__":
-    os.chdir(TEST_DIR)
-    os.environ["PYTHONPATH"] = ":".join([SRC_DIR, TEST_DIR])
+    os.chdir(PROJECT_DIR)
+    os.environ["PYTHONPATH"] = PROJECT_DIR
     runtestdir("bindertest")
 
