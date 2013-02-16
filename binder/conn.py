@@ -1,6 +1,5 @@
 
 from binder import sqlgen
-from binder.sqlgen import DIALECT_POSTGRES
 
 _debug = False
 
@@ -16,14 +15,14 @@ _VALID_ISOLATION_LEVELS = [
 
 class Connection:
 
-    def __init__(self, dbconn, dberror, dialect, paramstr, read_only):
+    def __init__(self, dbconn, dberror, sqlite, read_only):
         self._is_open = True
         self._dbconn = dbconn
         self._last_ri = None
         self._read_only = read_only
         self.DbError = dberror
-        self.dialect = dialect
-        self.paramstr = paramstr
+        self.sqlite = sqlite
+        self.paramstr = "?" if sqlite else "%s"
 
 
     def commit(self):
@@ -62,7 +61,7 @@ class Connection:
         # read only check
         self._check_write_ok()
         #
-        sql = sqlgen.create_table(self.dialect, table)
+        sql = sqlgen.create_table(self.sqlite, table)
         self._execute(sql)
 
     def drop_table(self, table, if_exists=False):
@@ -81,14 +80,14 @@ class Connection:
         self._check_write_ok()
         # gen sql
         sql, values, auto_id_used = \
-            sqlgen.insert(table, row, self.dialect, self.paramstr)
+            sqlgen.insert(table, row, self.sqlite, self.paramstr)
         # execute sql
         cursor = self._execute(sql, values)
         assert cursor.rowcount == 1, \
             "insert(): expected rowcount=1, got %s" % cursor.rowcount
         # replace AutoIdCol None with actual id
         if auto_id_used:
-            if self.dialect == DIALECT_POSTGRES:
+            if not self.sqlite:
                 new_id = cursor.fetchone()[0]
             else:
                 new_id = cursor.lastrowid
@@ -101,7 +100,7 @@ class Connection:
         self._check_write_ok()
         # gen sql
         sql, values = sqlgen.update(
-            table, row, where, self.dialect, self.paramstr
+            table, row, where, self.sqlite, self.paramstr
             )
         # execute sql
         cursor = self._execute(sql, values)
@@ -133,7 +132,7 @@ class Connection:
         self._check_write_ok()
         # gen sql
         sql, values = sqlgen.delete(
-            table, where, self.dialect, self.paramstr
+            table, where, self.sqlite, self.paramstr
             )
         # execute sql
         cursor = self._execute(sql, values)
@@ -178,7 +177,7 @@ class Connection:
     def xselect(self, table, where=None, order_by=None):
         # gen sql
         sql, values = sqlgen.select(
-            table, where, order_by, self.dialect, self.paramstr
+            table, where, order_by, self.sqlite, self.paramstr
             )
         # execute sql
         cursor = self._execute(sql, values)
@@ -212,7 +211,7 @@ class Connection:
     def xselect_distinct(self, table, qcol, where=None, order_by=None):
         # gen sql
         sql, values = sqlgen.select_distinct(
-            table, qcol, where, order_by, self.dialect, self.paramstr
+            table, qcol, where, order_by, self.sqlite, self.paramstr
             )
         # execute sql
         cursor = self._execute(sql, values)

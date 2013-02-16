@@ -3,9 +3,6 @@ from binder.col import *
 from binder.table import SqlCondition, SqlSort, AND, OR, QueryCol
 
 
-DIALECT_SQLITE = "sqlite"
-DIALECT_POSTGRES = "postgres"
-
 _COL_TYPE_SQLITE = {
     AutoIdCol: "INTEGER PRIMARY KEY",
     IntCol: "INTEGER",
@@ -26,20 +23,18 @@ _COL_TYPE_POSTGRES = {
     DateTimeUTCCol: "TIMESTAMP",
 }
 
-def create_table(dialect, table):
-    if dialect == DIALECT_SQLITE:
+def create_table(sqlite, table):
+    if sqlite:
         col_types = _COL_TYPE_SQLITE
         collate_nocase_name = "NOCASE"
-    elif dialect == DIALECT_POSTGRES:
+    else:
         col_types = _COL_TYPE_POSTGRES
         collate_nocase_name = '"C"'
-    else:
-        assert False, "Unknown dialect: %s" % dialect
     col_defs = []
     for col in table.cols:
         col_type = col_types[col.__class__]
         col_def = "%s %s" % (col.col_name, col_type)
-        if col.__class__ is UnicodeCol and dialect != DIALECT_SQLITE:
+        if col.__class__ is UnicodeCol and not sqlite:
             col_def = "%s(%d)" % (col_def, col.length)
         if col.not_null and not col.__class__ is AutoIdCol:
             col_def = col_def + " NOT NULL"
@@ -62,7 +57,7 @@ def drop_table(table, if_exists):
 
 
 
-def insert(table, row, dialect, paramstr):
+def insert(table, row, sqlite, paramstr):
     values = []
     col_names = []
     value_qs = []
@@ -87,12 +82,12 @@ def insert(table, row, dialect, paramstr):
     values_sql = ",".join(value_qs)
     sql = "INSERT INTO %s (%s) VALUES (%s)" \
         % (table.table_name, col_names_sql, values_sql)
-    if auto_id_used and dialect == DIALECT_POSTGRES:
+    if auto_id_used and not sqlite:
         sql = sql + " RETURNING " + auto_id_col.col_name
     return sql, values, auto_id_used
 
 
-def update(table, row, where, dialect, paramstr):
+def update(table, row, where, sqlite, paramstr):
     values = []
     col_names = []
     auto_id_col = table.auto_id_col
@@ -111,7 +106,7 @@ def update(table, row, where, dialect, paramstr):
     col_sql = ",".join(col_names)
     sql_parts = ["UPDATE", table.table_name, "SET", col_sql]
     if not where is None:
-        cond_sql, where_values = _sqlcond_to_sql(where, dialect, paramstr)
+        cond_sql, where_values = _sqlcond_to_sql(where, sqlite, paramstr)
         sql_parts.append("WHERE")
         sql_parts.append(cond_sql)
         values.extend(where_values)
@@ -146,8 +141,8 @@ def update_by_id(table, row, paramstr):
     return sql, values
 
 
-def delete(table, where, dialect, paramstr):
-    cond_sql, values = _sqlcond_to_sql(where, dialect, paramstr)
+def delete(table, where, sqlite, paramstr):
+    cond_sql, values = _sqlcond_to_sql(where, sqlite, paramstr)
     sql = "DELETE FROM %s WHERE %s" % (table.table_name, cond_sql)
     return sql, values
 
@@ -165,13 +160,13 @@ def delete_by_id(table, row_id, paramstr):
     return sql, values
 
 
-def select(table, where, order_by, dialect, paramstr):
+def select(table, where, order_by, sqlite, paramstr):
     col_names = [col.col_name for col in table.cols]
     col_names_sql = ",".join(col_names)
     sql_parts = ["SELECT", col_names_sql, "FROM", table.table_name]
     if where:
         sql_parts.append("WHERE")
-        cond_sql, values = _sqlcond_to_sql(where, dialect, paramstr)
+        cond_sql, values = _sqlcond_to_sql(where, sqlite, paramstr)
         sql_parts.append(cond_sql)
     else:
         values = []
@@ -182,13 +177,13 @@ def select(table, where, order_by, dialect, paramstr):
     return sql, values
 
 
-def select_distinct(table, qcol, where, order_by, dialect, paramstr):
+def select_distinct(table, qcol, where, order_by, sqlite, paramstr):
     assert isinstance(qcol, QueryCol), "Column must be instance of QueryCol"
     col_name = qcol._col.col_name
     sql_parts = ["SELECT DISTINCT", col_name, "FROM", table.table_name]
     if where:
         sql_parts.append("WHERE")
-        cond_sql, values = _sqlcond_to_sql(where, dialect, paramstr)
+        cond_sql, values = _sqlcond_to_sql(where, sqlite, paramstr)
         sql_parts.append(cond_sql)
     else:
         values = []
@@ -201,7 +196,7 @@ def select_distinct(table, qcol, where, order_by, dialect, paramstr):
     return sql, values
 
 
-def _op_eq(sqlcond, dialect, paramstr):
+def _op_eq(sqlcond, sqlite, paramstr):
     if sqlcond.other == None:
         return "%s is NULL", False, None
     else:
@@ -209,7 +204,7 @@ def _op_eq(sqlcond, dialect, paramstr):
         value = sqlcond.col.py_to_db(sqlcond.other)
         return cond_sql, True, value
 
-def _op_gtgteltlte(sqlcond, dialect, paramstr):
+def _op_gtgteltlte(sqlcond, sqlite, paramstr):
     assert not isinstance(sqlcond.col, BoolCol), \
         "Op '%s' does not support BoolCol" % sqlcond.op
     assert not isinstance(sqlcond.col, DateTimeUTCCol), \
@@ -220,76 +215,66 @@ def _op_gtgteltlte(sqlcond, dialect, paramstr):
     value = sqlcond.col.py_to_db(sqlcond.other)
     return cond_sql, True, value
 
-def _op_YEAR(sqlcond, dialect, paramstr):
+def _op_YEAR(sqlcond, sqlite, paramstr):
     assert isinstance(sqlcond.col, DateCol), \
         "YEAR condition can only be used for DateCol"
     assert sqlcond.other != None, \
         "YEAR condition cannot use None"
-    if dialect == DIALECT_SQLITE:
+    if sqlite:
         cond_sql = "%s LIKE " + paramstr
         value = "%d-%%" % sqlcond.other.year
-    elif dialect == DIALECT_POSTGRES:
+    else:
         cond_sql = "EXTRACT(YEAR FROM %s)=" + paramstr
         value = sqlcond.other.year
-    else:
-        raise Exception, ("Unknown dialect", dialect)
     return cond_sql, True, value
 
-def _op_MONTH(sqlcond, dialect, paramstr):
+def _op_MONTH(sqlcond, sqlite, paramstr):
     assert isinstance(sqlcond.col, DateCol), \
         "MONTH condition can only be used for DateCol"
     assert sqlcond.other != None, \
         "MONTH condition cannot use None"
-    if dialect == DIALECT_SQLITE:
+    if sqlite:
         cond_sql = "%s LIKE " + paramstr
         value = "%%-%02d-%%" % sqlcond.other.month
-    elif dialect == DIALECT_POSTGRES:
+    else:
         cond_sql = "EXTRACT(MONTH FROM %s)=" + paramstr
         value = sqlcond.other.month
-    else:
-        raise Exception, ("Unknown dialect", dialect)
     return cond_sql, True, value
 
-def _op_DAY(sqlcond, dialect, paramstr):
+def _op_DAY(sqlcond, sqlite, paramstr):
     assert isinstance(sqlcond.col, DateCol), \
         "DAY condition can only be used for DateCol"
     assert sqlcond.other != None, \
         "DAY condition cannot use None"
-    if dialect == DIALECT_SQLITE:
+    if sqlite:
         cond_sql = "%s LIKE " + paramstr
         value = "%%-%02d" % sqlcond.other.day
-    elif dialect == DIALECT_POSTGRES:
+    else:
         cond_sql = "EXTRACT(DAY FROM %s)=" + paramstr
         value = sqlcond.other.day
-    else:
-        raise Exception, ("Unknown dialect", dialect)
     return cond_sql, True, value
 
-def _op_LIKE(sqlcond, dialect, paramstr):
+def _op_LIKE(sqlcond, sqlite, paramstr):
     assert isinstance(sqlcond.col, UnicodeCol), \
         "LIKE condition can only be used for UnicodeCol"
     assert sqlcond.other != None, \
         "LIKE condition cannot use None"
-    if dialect == DIALECT_SQLITE:
+    if sqlite:
         raise NotImplementedError
-    elif dialect == DIALECT_POSTGRES:
-        cond_sql = "%s LIKE " + paramstr
     else:
-        raise Exception, ("Unknown dialect", dialect)
+        cond_sql = "%s LIKE " + paramstr
     value = sqlcond.other
     return cond_sql, True, value
 
-def _op_ILIKE(sqlcond, dialect, paramstr):
+def _op_ILIKE(sqlcond, sqlite, paramstr):
     assert isinstance(sqlcond.col, UnicodeCol), \
         "LIKE condition can only be used for UnicodeCol"
     assert sqlcond.other != None, \
         "LIKE condition cannot use None"
-    if dialect == DIALECT_SQLITE:
+    if sqlite:
         cond_sql = "%s LIKE " + paramstr
-    elif dialect == DIALECT_POSTGRES:
-        cond_sql = "%s ILIKE " + paramstr
     else:
-        raise Exception, ("Unknown dialect", dialect)
+        cond_sql = "%s ILIKE " + paramstr
     value = sqlcond.other
     return cond_sql, True, value
 
@@ -308,7 +293,7 @@ _OP_MAP = {
     }
 
 
-def _sqlcond_to_sql(where, dialect, paramstr):
+def _sqlcond_to_sql(where, sqlite, paramstr):
     if paramstr == "%s":
         paramstr = "%%s"
     combiner = " AND "
@@ -327,7 +312,7 @@ def _sqlcond_to_sql(where, dialect, paramstr):
         op_fn = _OP_MAP.get(sqlcond.op)
         if not op_fn:
             raise AssertionError, "Unsupported op '%s'" % sqlcond.op
-        cond_sql, have_value, value = op_fn(sqlcond, dialect, paramstr)
+        cond_sql, have_value, value = op_fn(sqlcond, sqlite, paramstr)
         cond_sql = cond_sql % sqlcond.col.col_name
         cond_sqls.append(cond_sql)
         if have_value:

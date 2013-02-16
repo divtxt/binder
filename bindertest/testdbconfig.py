@@ -31,6 +31,6 @@ def connect_postgres(read_only=None, isolation_level=None):
 
 
 # Test DB - modify as needed
-connect = connect_sqlite
-#connect = connect_postgres
+#connect = connect_sqlite
+connect = connect_postgres
 

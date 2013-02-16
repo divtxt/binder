@@ -1,7 +1,6 @@
 
 from binder.conn import Connection, READ_COMMITTED, REPEATABLE_READ, \
     _VALID_ISOLATION_LEVELS
-from binder.sqlgen import DIALECT_POSTGRES
 
 
 _psycopg2_imported = False
@@ -44,8 +43,4 @@ class PostgresConnection(Connection):
         dbconn = psycopg2.connect(*args, **kwargs)
         dbconn.set_session(pg_isolation_level)
         dberror = psycopg2.Error
-        Connection.__init__(
-            self, dbconn, dberror,
-            DIALECT_POSTGRES, "%s",
-            read_only
-            )
+        Connection.__init__(self, dbconn, dberror, False, read_only)
