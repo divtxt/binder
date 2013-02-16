@@ -127,7 +127,7 @@ class Connection:
             )
 
 
-    def delete(self, table, where):
+    def delete(self, table, where=None):
         # read only check
         self._check_write_ok()
         # gen sql

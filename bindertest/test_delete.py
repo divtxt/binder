@@ -19,6 +19,18 @@ class ConnDeleteTest(unittest.TestCase):
         conn.create_table(Bar)
         conn.commit()
 
+    def test_delete_all(self):
+        conn = connect()
+        foo1 = Foo.new(foo_id=1, i1=101, s1="alpha")
+        foo2 = Foo.new(foo_id=2, s1="beta")
+        conn.insert(Foo, foo1)
+        conn.insert(Foo, foo2)
+        found = conn.delete(Foo)
+        self.assertEquals(2, found)
+        self.assertEquals([], conn.select(Foo))
+        found = conn.delete(Foo)
+        self.assertEquals(0, found)
+
     def test_delete_by_id(self):
         conn = connect()
         foo1 = Foo.new(foo_id=1, i1=101, s1="alpha")
