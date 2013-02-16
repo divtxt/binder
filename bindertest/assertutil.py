@@ -14,3 +14,19 @@ def get_assert_tuple_args(e):
         assert len(args) == 1
         return args[0]
 
+# copy/paste for use in pre-2.7
+_MAX_LENGTH = 80
+def safe_repr(obj, short=False):
+    try:
+        result = repr(obj)
+    except Exception:
+        result = object.__repr__(obj)
+    if not short or len(result) < _MAX_LENGTH:
+        return result
+    return result[:_MAX_LENGTH] + ' [truncated]...'
+def assertIn(self, member, container, msg=None):
+    """Just like self.assertTrue(a in b), but with a nicer default message."""
+    if member not in container:
+        standardMsg = '%s not found in %s' % (safe_repr(member),
+                                              safe_repr(container))
+        self.fail(self._formatMessage(msg, standardMsg))

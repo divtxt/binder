@@ -1,5 +1,6 @@
 
 import unittest
+from assertutil import assertIn
 
 from binder import *
 import datetime
@@ -48,7 +49,7 @@ class ConnInsertTest(unittest.TestCase):
         try:
             conn.insert(Foo, foo)
         except conn.DbError, e:
-            self.assertIn(
+            assertIn(self,
                 e.args,
                 [
                     ("PRIMARY KEY must be unique",),
@@ -69,7 +70,7 @@ class ConnInsertTest(unittest.TestCase):
         try:
             conn.insert(Baz, baz2)
         except conn.DbError, e:
-            self.assertIn(
+            assertIn(self,
                 e.args,
                 [
                     ("column s3 is not unique",),
@@ -90,7 +91,7 @@ class ConnInsertTest(unittest.TestCase):
         try:
             conn.insert(Baz, baz2)
         except conn.DbError, e:
-            self.assertIn(
+            assertIn(self,
                 e.args,
                 [
                     ("column s3 is not unique",),

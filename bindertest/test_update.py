@@ -1,6 +1,6 @@
 
 import unittest
-from assertutil import get_assert_tuple_args
+from assertutil import get_assert_tuple_args, assertIn
 
 from binder import *
 import datetime
@@ -111,7 +111,7 @@ class ConnUpdateTest(unittest.TestCase):
         try:
             conn.update(Foo, foo4a, Foo.q.s1 == "alpha")
         except conn.DbError, e:
-            self.assertIn(
+            assertIn(self,
                 e.args,
                 [
                     ("PRIMARY KEY must be unique",),
@@ -134,7 +134,7 @@ class ConnUpdateTest(unittest.TestCase):
         try:
             conn.update(Baz, baz3, Baz.q.f3 == 42.42)
         except conn.DbError, e:
-            self.assertIn(
+            assertIn(self,
                 e.args,
                 [
                     ("column s3 is not unique",),

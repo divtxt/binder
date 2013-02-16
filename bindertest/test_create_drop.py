@@ -1,5 +1,6 @@
 
 import unittest
+from assertutil import assertIn
 
 from binder import *
 
@@ -33,7 +34,7 @@ class CreateDropTest(unittest.TestCase):
         try:
             conn.drop_table(Foo)
         except conn.DbError, e:
-            self.assertIn(e.args, _NO_TABLE_FOO)
+            assertIn(self, e.args, _NO_TABLE_FOO)
         conn.commit()
         conn = connect()
         conn.create_table(Foo)
@@ -41,13 +42,13 @@ class CreateDropTest(unittest.TestCase):
         try:
             conn.create_table(Foo)
         except conn.DbError, e:
-            self.assertIn(e.args, _TABLE_FOO_EXISTS)
+            assertIn(self, e.args, _TABLE_FOO_EXISTS)
         conn.drop_table(Foo)
         conn = connect()
         try:
             conn.drop_table(Foo)
         except conn.DbError, e:
-            self.assertIn(e.args, _NO_TABLE_FOO)
+            assertIn(self, e.args, _NO_TABLE_FOO)
 
     def test_create_transactional(self):
         conn = connect()
@@ -57,7 +58,7 @@ class CreateDropTest(unittest.TestCase):
             try:
                 conn.drop_table(Foo)
             except conn.DbError, e:
-                self.assertIn(e.args, _NO_TABLE_FOO)
+                assertIn(self, e.args, _NO_TABLE_FOO)
         else:
             conn.drop_table(Foo)
 
@@ -66,7 +67,7 @@ class CreateDropTest(unittest.TestCase):
         try:
             conn.drop_table(Foo)
         except conn.DbError, e:
-            self.assertIn(e.args, _NO_TABLE_FOO)
+            assertIn(self, e.args, _NO_TABLE_FOO)
         conn = connect()
         conn.create_table(Foo)
         conn = connect()
@@ -74,7 +75,7 @@ class CreateDropTest(unittest.TestCase):
         try:
             conn.drop_table(Foo)
         except conn.DbError, e:
-            self.assertIn(e.args, _NO_TABLE_FOO)
+            assertIn(self, e.args, _NO_TABLE_FOO)
         conn = connect()
         conn.drop_table(Foo, if_exists=True)
         conn.drop_table_if_exists(Foo)
