@@ -18,6 +18,7 @@ class Connection:
     def __init__(self, dbconn, dberror, sqlite, read_only):
         self._is_open = True
         self._dbconn = dbconn
+        self._cursor = self._dbconn.cursor()
         self._read_only = read_only
         self.DbError = dberror
         self.sqlite = sqlite
@@ -33,6 +34,7 @@ class Connection:
     def close(self):
         self._dbconn.close()
         self._dbconn = None
+        self._cursor = None
         self._is_open = False
 
 
@@ -40,9 +42,8 @@ class Connection:
         assert self._is_open, "Connection is closed"
         if _debug:
             print "DEBUG: _execute(%s, %s)" % (repr(sql), values)
-        cursor = self._dbconn.cursor()
-        cursor.execute(sql, values)
-        return cursor
+        self._cursor.execute(sql, values)
+        return self._cursor
 
     def _check_write_ok(self):
         if self._read_only:
