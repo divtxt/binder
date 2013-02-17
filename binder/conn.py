@@ -174,38 +174,40 @@ class Connection:
 
     get = select_by_id
 
-    def xselect(self, table, where=None, order_by=None):
+    def select(self, table, where=None, order_by=None):
         # gen sql
         sql, values = sqlgen.select(
             table, where, order_by, self.sqlite, self.paramstr
             )
         # execute sql
         cursor = self._execute(sql, values)
-        # result iterator
-        i = ResultIterator(cursor, table, self.DbError, where)
-        self._last_ri = i
-        return i
-
-    def select(self, table, where=None, order_by=None):
-        return list(
-                self.xselect(table, where, order_by)
-            )
+        # convert
+        cols = table.cols
+        r = range(len(cols))
+        db_to_pys = [c.db_to_py for c in cols]
+        cnames = [c.col_name for c in cols]
+        l = []
+        for values in cursor.fetchall():
+            row = {}
+            for i in r:
+                row[cnames[i]] = db_to_pys[i](values[i])
+            l.append(row)
+        #
+        return l
 
 
     def select_one(self, table, where=None, order_by=None):
         #
-        i = self.xselect(table, where, order_by)
+        l = self.select(table, where, order_by)
         #
-        row = None
-        try:
-            row = i.next()
-            i.next()
-            assert False, (
+        if l:
+            assert len(l) == 1, (
                     "select_one(): more than 1 row",
-                    (table.table_name, i.where) #, rc)
+                    (table.table_name, where) #, rc)
                 )
-        except StopIteration:
-            return row
+            return l[0]
+        else:
+            return None
 
 
     def xselect_distinct(self, table, qcol, where=None, order_by=None):
@@ -224,43 +226,6 @@ class Connection:
         return list(
                 self.xselect_distinct(table, qcol, where, order_by)
             )
-
-
-
-
-class ResultIterator:
-
-    def __init__(self, cursor, table, DbError, where):
-        self.cursor = cursor
-        self.table = table
-        self.DbError = DbError
-        self.where = where
-        self.closed = False
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        if self.closed:
-            raise self.DbError, "Result cursor closed."
-        row = {}
-        values = self.cursor.fetchone()
-        if values is None:
-            self.cursor = None
-            raise StopIteration
-        cols = self.table.cols
-        for i in range(len(cols)):
-            col = cols[i]
-            dbvalue = values[i]
-            value = col.db_to_py(dbvalue)
-            row[col.col_name] = value
-        return row
-
-
-    def close(self):
-        self.closed = True
-        if self.cursor:
-            self.cursor.close()
 
 
 
