@@ -18,7 +18,6 @@ class Connection:
     def __init__(self, dbconn, dberror, sqlite, read_only):
         self._is_open = True
         self._dbconn = dbconn
-        self._last_ri = None
         self._read_only = read_only
         self.DbError = dberror
         self.sqlite = sqlite
@@ -32,22 +31,15 @@ class Connection:
         self._dbconn.rollback()
 
     def close(self):
-        self._close_last_ri()
         self._dbconn.close()
         self._dbconn = None
         self._is_open = False
 
 
-    def _close_last_ri(self):
-        if self._last_ri:
-            self._last_ri.close()
-            self._last_ri = None
-
     def _execute(self, sql, values=[]):
         assert self._is_open, "Connection is closed"
         if _debug:
             print "DEBUG: _execute(%s, %s)" % (repr(sql), values)
-        self._close_last_ri()
         cursor = self._dbconn.cursor()
         cursor.execute(sql, values)
         return cursor
