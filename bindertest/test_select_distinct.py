@@ -26,13 +26,11 @@ class ConnSelectDistinctTest(unittest.TestCase):
         conn.insert(Foo, foo3)
         conn.commit()
 
-    def test_xselect_distinct(self):
+    def test_select_distinct(self):
         conn = connect()
-        foo_list = \
-            conn.xselect_distinct(Foo, Foo.q.i1)
+        foo_list = conn.select_distinct(Foo, Foo.q.i1)
         # FIXME: depending on db order
-        self.assertEquals(101, foo_list.next())
-        self.assertEquals(102, foo_list.next())
+        self.assertEquals([101, 102], foo_list)
 
     def test_where(self):
         conn = connect()

@@ -122,7 +122,7 @@ class Connection:
             return False
         row_id = values[-1]
         assert False, (
-                "update_by_id(): more than 1 row updated", 
+                "update_by_id(): more than 1 row updated",
                 (table.table_name, table.auto_id_col.col_name, row_id, rc)
             )
 
@@ -181,7 +181,7 @@ class Connection:
             )
         # execute sql
         cursor = self._execute(sql, values)
-        # convert
+        # convert results
         cols = table.cols
         r = range(len(cols))
         db_to_pys = [c.db_to_py for c in cols]
@@ -210,47 +210,18 @@ class Connection:
             return None
 
 
-    def xselect_distinct(self, table, qcol, where=None, order_by=None):
+    def select_distinct(self, table, qcol, where=None, order_by=None):
         # gen sql
         sql, values = sqlgen.select_distinct(
             table, qcol, where, order_by, self.sqlite, self.paramstr
             )
         # execute sql
         cursor = self._execute(sql, values)
-        # result iterator
-        i = SelectDistinctResultIterator(cursor, self.DbError)
-        self._last_ri = i
-        return i
+        # convert results
+        l = []
+        for values in cursor.fetchall():
+            #assert len(values) == 1
+            l.append(values[0])
+        #
+        return l
 
-    def select_distinct(self, table, qcol, where=None, order_by=None):
-        return list(
-                self.xselect_distinct(table, qcol, where, order_by)
-            )
-
-
-
-
-class SelectDistinctResultIterator:
-
-    def __init__(self, cursor, DbError):
-        self.cursor = cursor
-        self.DbError = DbError
-        self.closed = False
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        if self.closed:
-            raise self.DbError, "Result cursor closed."
-        values = self.cursor.fetchone()
-        if values is None:
-            self.cursor = None
-            raise StopIteration
-        #assert len(values) == 1
-        return values[0]
-
-    def close(self):
-        self.closed = True
-        if self.cursor:
-            self.cursor.close()
