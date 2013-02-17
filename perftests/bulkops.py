@@ -6,6 +6,7 @@ sys.path.append(PROJECT_DIR)
 
 from binder import *
 import datetime
+import types
 
 from bindertest.testdbconfig import connect
 
@@ -26,8 +27,8 @@ LOADED_DATA_DICTS = None
 CSV_COLS = ["zip", "city", "state", "latitude", "longitude", "timezone", "dst"]
 DB_COLS = ["zip", "city", "state", "timezone", "dst"]
 
-def setup():
-    global LOADED_DATA_LISTS, LOADED_DATA_DICTS
+def setup_init():
+    global conn, LOADED_DATA_LISTS, LOADED_DATA_DICTS
     LOADED_DATA_LISTS = []
     LOADED_DATA_DICTS = []
     import csv
@@ -47,10 +48,14 @@ def setup():
     conn.create_table(ZipCode)
     conn.commit()
 
-def dbapi_insert():
-    conn = connect()
+def setup_delete_all():
+    global conn
     conn.delete(ZipCode, None)
     conn.commit()
+
+def dbapi_insert():
+    setup_delete_all()
+    global conn
     dbconn = conn._dbconn
     cursor = dbconn.cursor()
     sql = "INSERT INTO ZipCode (zip, city, state, timezone, dst) VALUES (%s)" \
@@ -60,30 +65,50 @@ def dbapi_insert():
     conn.commit()
 
 def binder_insert():
-    conn = connect()
-    conn.delete(ZipCode, None)
-    conn.commit()
-    sql = "INSERT INTO ZipCode (zip, city, state, timezone, dst) VALUES (%s)" \
-        % ",".join([conn.paramstr] * 5)
+    setup_delete_all()
+    global conn
     for d in LOADED_DATA_DICTS:
         conn.insert(ZipCode, d)
+    conn.commit()
+
+def dbapi_select_all():
+    global conn
+    dbconn = conn._dbconn
+    cursor = dbconn.cursor()
+    sql = "SELECT zip, city, state, timezone, dst FROM zipcode WHERE state=" \
+        + conn.paramstr
+    cursor.execute(sql, ["CA"])
+    cursor.fetchall()
+    conn.commit()
+
+def binder_select_all():
+    global conn
+    conn.select(ZipCode) #, ZipCode.q.state == "CA")
     conn.commit()
 
 
 if __name__ == "__main__":
     import timeit
-    setup()
-    reps = 1
     testfns = [
-        "dbapi_insert",
-        "binder_insert",
+        setup_init,
+        ("dbapi_insert", 1),
+        ("binder_insert", 1),
+        setup_delete_all,
+        binder_insert,
+        ("dbapi_select_all", 10),
+        ("binder_select_all", 10),
         ]
-    print "Reps:", reps
     for f in testfns:
-        t = timeit.timeit(
-            "%s()" % f,
-            setup="from __main__ import %s" % f,
-            number=reps
-            )
-        print "%-40s %10f %10f" % (f, t, t/reps)
+        if type(f) is types.FunctionType:
+            print "*", f.__name__
+            f()
+        else:
+            f, reps = f
+            print "%-30s %10d" % (f, reps),
+            t = timeit.timeit(
+                "%s()" % f,
+                setup="from __main__ import %s" % f,
+                number=reps
+                )
+            print "%10f %10f" % (t, t/reps)
 
