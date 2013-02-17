@@ -64,6 +64,16 @@ def dbapi_insert():
         cursor.execute(sql, row)
     conn.commit()
 
+def dbapi_insertmany():
+    setup_delete_all()
+    global conn
+    dbconn = conn._dbconn
+    cursor = dbconn.cursor()
+    sql = "INSERT INTO ZipCode (zip, city, state, timezone, dst) VALUES (%s)" \
+        % ",".join([conn.paramstr] * 5)
+    cursor.executemany(sql, LOADED_DATA_LISTS)
+    conn.commit()
+
 def binder_insert():
     setup_delete_all()
     global conn
@@ -91,8 +101,9 @@ if __name__ == "__main__":
     import timeit
     testfns = [
         setup_init,
-        ("dbapi_insert", 1),
         ("binder_insert", 1),
+        ("dbapi_insert", 1),
+        ("dbapi_insertmany", 1),
         setup_delete_all,
         binder_insert,
         ("dbapi_select_all", 10),
