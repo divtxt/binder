@@ -85,15 +85,14 @@ def dbapi_select_all():
     global conn
     dbconn = conn._dbconn
     cursor = dbconn.cursor()
-    sql = "SELECT zip, city, state, timezone, dst FROM zipcode WHERE state=" \
-        + conn.paramstr
-    cursor.execute(sql, ["CA"])
+    sql = "SELECT zip, city, state, timezone, dst FROM zipcode"
+    cursor.execute(sql, [])
     cursor.fetchall()
     conn.commit()
 
 def binder_select_all():
     global conn
-    conn.select(ZipCode) #, ZipCode.q.state == "CA")
+    conn.select(ZipCode)
     conn.commit()
 
 
