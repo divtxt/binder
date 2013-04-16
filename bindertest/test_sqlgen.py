@@ -367,6 +367,11 @@ class DeleteTest(unittest.TestCase):
         self.assertEquals("DELETE FROM foo WHERE i1=? OR s1=?", sql)
         self.assertEquals([12, "aeiou"], values)
 
+    def test_no_where(self):
+        sql, values = sqlgen.delete(Foo, None, True, "?")
+        self.assertEquals("DELETE FROM foo", sql)
+        self.assertEquals([], values)
+
     def test_bad_values(self):
         try:
             sqlgen.delete(

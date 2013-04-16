@@ -165,8 +165,14 @@ def update_by_id(table, row, paramstr):
 
 
 def delete(table, where, dialect, paramstr):
-    cond_sql, values = _sqlcond_to_sql(where, dialect, paramstr)
-    sql = "DELETE FROM %s WHERE %s" % (table.table_name, cond_sql)
+    sql_parts = ["DELETE FROM", table.table_name]
+    if where:
+        sql_parts.append("WHERE")
+        cond_sql, values = _sqlcond_to_sql(where, dialect, paramstr)
+        sql_parts.append(cond_sql)
+    else:
+        values = []
+    sql = " ".join(sql_parts)
     return sql, values
 
 
