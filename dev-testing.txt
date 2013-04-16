@@ -22,9 +22,9 @@ To test MySQL or PostgreSQL, use the following steps:
 
 2. Install Python MySQLdb and/or psycopg2
 
-3. Edit 'test/bindertest/testdbconfig.py' with db details e.g. MYSQL_TESTDB
+3. Edit 'bindertest/testdbconfig.py' with test db details e.g. MYSQL_TESTDB
 
-4. Edit 'test/bindertest/testdbconfig.py' to use the correct db i.e. comment
+4. Edit 'bindertest/testdbconfig.py' to use the correct db i.e. comment
 and uncomment the following set of lines as appropriate:
 
     # Test DB - modify as needed
